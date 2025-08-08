@@ -1,0 +1,24 @@
+.main-div {
+    transition: width, 500ms;
+    overflow: auto;
+    height: calc(100vh);
+    padding: 6px 0px;
+    width: 100% !important;
+  }
+  .css-13cymwt-control{
+    border: 2px solid #e7e7e7 !important;
+    height: 32px !important;
+    background-color: #f5f5f5;
+  }
+
+
+  .dialog-content {
+    position: absolute !important;
+    top: 10% !important;
+    background: #ffffff !important;
+    width: 50% !important;
+    left: 20%;
+    border: 2px solid #e5dddd !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+  }
