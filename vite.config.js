@@ -1,14 +1,17 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-// https://vite.dev/config/
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+// import tailwindcss from "@tailwindcss/vite";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export default defineConfig({
-   define: {
-    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
-  },
+  plugins: [react()],
   resolve: {
     alias: {
-      'jwt-decode': 'jwt-decode/dist/jwt-decode.esm.js'
-    }
+      "@": path.resolve(__dirname, "src"), // ✅ make sure it's "src" (no ./)
+    },
   },
-  plugins: [react()],
-})
+});

@@ -1,62 +1,58 @@
-import React, { Suspense, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { approutes } from "./routes-navs/approutes";
-import LayoutMain from "./layouts/layout/LayoutMain";
-import { ToastContainer } from "react-toastify";
-import { Tooltip } from "react-tooltip";
-import "react-toastify/dist/ReactToastify.css";
+import { isExpired } from "react-jwt";
 import {
   LoginAction,
   LogOutAction,
   PlantSelectionAction,
-  SetPlantsAction,
 } from "../src/store/slices/LoginSlice";
-import { isExpired } from "react-jwt";
+import "./App.css";
 import LocalStorageHelper from "./services/LocalStorageHelper";
 import useFetchAPI from "./hooks/useFetchAPI";
-
+import LoadingScreen from "./components/loaders/LoadingScreen";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppRoutes } from "./routes-navs/AppRoutes";
+import MainLayout from "./layouts/MainLayout";
 function App() {
-  const { IsLoggedIn } = useSelector((state) => state.LoginReducer);
+  const { isLoggedIn } = useSelector((state) => state.LoginReducer);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  console.log(import.meta.env.VITE_API_URL);
 
-  const [_, PlantsFetchHandler] = useFetchAPI(
-    {
-      url: `/plant`,
-      method: "GET",
-    },
-    (res) => {
-      const selectedPlant = LocalStorageHelper.getItem("selectedPlant");
-      const allPlants = res?.Plant ?? [];
+  // const [_, PlantsFetchHandler] = useFetchAPI(
+  //   {
+  //     url: `/plant`,
+  //     method: "GET",
+  //   },
+  //   (res) => {
+  //     const selectedPlant = LocalStorageHelper.getItem("selectedPlant");
+  //     const allPlants = res?.Plant ?? [];
 
-      dispatch(SetPlantsAction(allPlants));
+  //     dispatch(SetPlantsAction(allPlants));
 
-      const validatedPlant = allPlants.find(
-        (item) => item?._id === selectedPlant?._id
-      );
+  //     const validatedPlant = allPlants.find(
+  //       (item) => item?._id === selectedPlant?._id
+  //     );
 
-      dispatch(
-        PlantSelectionAction(validatedPlant ?? allPlants?.[0] ?? null)
-      );
-      return res;
-    },
-    (err) => {
-      return err?.response ?? true;
-    }
-  );
+  //     dispatch(PlantSelectionAction(validatedPlant ?? allPlants?.[0] ?? null));
+  //     return res;
+  //   },
+  //   (err) => {
+  //     return err?.response ?? true;
+  //   }
+  // );
 
   const starterFunction = async () => {
     const token = LocalStorageHelper.getItem("accessToken") ?? null;
-    const user = LocalStorageHelper.getItem("user") ?? null;
     const refreshToken = LocalStorageHelper.getItem("refreshToken") ?? null;
-    const isTokenExpired = isExpired(token);
-
-    if (!token || !user || !refreshToken || isTokenExpired) {
+    const isTokenExpired = token ? isExpired(token) : true;
+    const isRefreshTokenExpired = refreshToken ? isExpired(refreshToken) : true;
+    if (isRefreshTokenExpired) {
       dispatch(LogOutAction());
+    } else if (isTokenExpired) {
+      // refresh token call
     } else {
-      dispatch(LoginAction({ accessToken: token, refreshToken, user }));
-      await PlantsFetchHandler();
+      // get userdetails
     }
   };
 
@@ -81,59 +77,20 @@ function App() {
   }, []);
 
   if (loading) {
-    return (
-      <div
-        style={{
-          height: "100vh",
-          width: "100vw",
-          backgroundColor: "#ffffff",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <p style={{ fontSize: "1.2rem", color: "#555" }}>
-          Loading application...
-        </p>
-      </div>
-    );
+    return <LoadingScreen />;
   }
-
   return (
-    <Suspense fallback={"Loading..."}>
-      <BrowserRouter>
-        <Routes>
-          {IsLoggedIn ? (
-            <Route path="/*" element={<LayoutMain />} />
-          ) : (
-            approutes.map((item, index) => (
-              <Route path={item.path} key={index} element={item.element} />
-            ))
-          )}
-        </Routes>
-      </BrowserRouter>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        limit={5}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-
-      <Tooltip
-        className="tool-tip-classname-default"
-        id="my-tooltip"
-        style={{ zIndex: "9999" }}
-      />
-    </Suspense>
+    <BrowserRouter>
+      <Routes>
+        {isLoggedIn ? (
+          <Route path="/*" element={<LayoutMain />} />
+        ) : (
+          AppRoutes.map((item, index) => (
+            <Route path={item.path} key={index} element={item.element} />
+          ))
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -2,11 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import LocalStorageHelper from "../../services/LocalStorageHelper";
 
 const initialState = {
-  IsLoggedIn: false,
-  Email: null,
-  password: null,
-  registeredPlants: [],
-  currentPlant: null
+  isLoggedIn: false,
+  userDetails: {},
+  email: null,
+  assignedPlants: [],
+  selectedPlant: null,
+  accessToken: null,
+  refreshToken: null,
 };
 // Login Slice
 const LoginSlice = createSlice({
@@ -14,46 +16,65 @@ const LoginSlice = createSlice({
   initialState,
   reducers: {
     LoginAction: (state, action) => {
+      const { accessToken, refreshToken, user, assignedPlants, selectedPlant } =
+        action.payload;
 
-      const { accessToken, refreshToken, user } = action.payload;
-      state.userDetails = user
-      state.IsLoggedIn = true;
+      state.userDetails = user;
+      state.isLoggedIn = true;
+      state.email = user?.email;
+      state.refreshToken = refreshToken;
+      state.accessToken = accessToken;
+      state.assignedPlants = assignedPlants;
+      state.selectedPlant = selectedPlant;
       LocalStorageHelper.setItem("user", user);
       LocalStorageHelper.setItem("accessToken", accessToken);
       LocalStorageHelper.setItem("refreshToken", refreshToken);
-
+      LocalStorageHelper.setItem("selectedPlant", selectedPlant);
+      LocalStorageHelper.setItem("assignedPlants", assignedPlants);
     },
     RefreshLoginAction: (state, action) => {
-      const { accessToken } = action.payload;
-      state.IsLoggedIn = true;
+      const { accessToken, user, assignedPlants, selectedPlant } =
+        action.payload;
+      state.userDetails = user;
+      state.isLoggedIn = true;
+      state.email = user?.email;
+      state.refreshToken = LocalStorageHelper.getItem("refreshToken");
+      state.accessToken = accessToken;
+      state.assignedPlants = assignedPlants;
+      state.selectedPlant = selectedPlant;
       LocalStorageHelper.setItem("accessToken", accessToken);
+      LocalStorageHelper.setItem("selectedPlant", selectedPlant);
+      LocalStorageHelper.setItem("assignedPlants", assignedPlants);
     },
     LogOutAction: (state) => {
-      state.IsLoggedIn = false;
-      state.userDetails = {}
+      state.userDetails = {};
+      state.isLoggedIn = false;
+      state.email = null;
+      state.refreshToken = null;
+      state.accessToken = null;
+      state.assignedPlants = [];
+      state.selectedPlant = null;
       LocalStorageHelper.setItem("user");
       LocalStorageHelper.setItem("accessToken");
       LocalStorageHelper.setItem("refreshToken");
+      LocalStorageHelper.removeItem("selectedPlant");
+      LocalStorageHelper.removeItem("assignedPlants");
     },
     PlantSelectionAction: (state, action) => {
-      const SelectedPlant = action.payload;
-      state.currentPlant = SelectedPlant;
-      LocalStorageHelper.setItem("selectedPlant", SelectedPlant);
-
+      const { selectedPlant, allPlants } = action.payload;
+      state.selectedPlant = selectedPlant;
+      state.assignedPlants = allPlants;
+      LocalStorageHelper.setItem("selectedPlant", selectedPlant);
+      LocalStorageHelper.setItem("assignedPlants", allPlants);
     },
-    SetPlantsAction: (state, action) => {
-      const AllPlants = action.payload;
-      state.registeredPlants = AllPlants;
-      LocalStorageHelper.setItem("allPlants", AllPlants);
-
-    }
   },
 });
 
 export const {
   LoginAction,
   LogOutAction,
-  RefreshLoginAction, PlantSelectionAction, SetPlantsAction
+  RefreshLoginAction,
+  PlantSelectionAction,
 } = LoginSlice.actions;
 
 export default LoginSlice.reducer;

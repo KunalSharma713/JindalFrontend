@@ -11,20 +11,20 @@ import { useDispatch } from "react-redux";
 // Custom hook to handle API fetch operations with several configurations.
 const useFetchAPI = (
   {
-    fullURL = null,  // Full URL for the API request. Defaults to null.
-    url = "",        // Endpoint URL to make the API request.
-    method = "GET",  // HTTP method (GET, POST, PUT, DELETE, etc.)
-    sendImmediately = false,  // Flag to send the request immediately on mount.
+    fullURL = null, // Full URL for the API request. Defaults to null.
+    url = "", // Endpoint URL to make the API request.
+    method = "GET", // HTTP method (GET, POST, PUT, DELETE, etc.)
+    sendImmediately = false, // Flag to send the request immediately on mount.
     authRequired = false, // Flag to check if authentication is required.
-    params = null,   // Query parameters to be sent with the request.
-    body = null,     // Request body to be sent (for POST, PUT requests).
-    headers = null,  // Custom headers to be passed with the request.
+    params = null, // Query parameters to be sent with the request.
+    body = null, // Request body to be sent (for POST, PUT requests).
+    headers = null, // Custom headers to be passed with the request.
     isAsync = false, // Flag for asynchronous handling of the request.
-    isRefreshCall = false,  // Flag for handling refresh token calls.
-    haltRequest = false,    // Flag to halt the request before sending.
+    isRefreshCall = false, // Flag for handling refresh token calls.
+    haltRequest = false, // Flag to halt the request before sending.
   },
   dataTransform = null, // Optional function to transform response data.
-  errorTransform = null   // Optional function to transform error data.
+  errorTransform = null // Optional function to transform error data.
 ) => {
   const dispatch = useDispatch();
 
@@ -125,20 +125,23 @@ const useFetchAPI = (
   const execute = async (newProps) => {
     setFetching(true);
     progressBarStart();
-    const token = LocalStorageHelper.getItem('accessToken'); // This may return null
+    // This may return null
     let fullurl = fullURL ?? import.meta.env.VITE_API_URL + url;
     let tokenHeader = {};
 
-    if (token) {
+    if (authRequired) {
+      const token = LocalStorageHelper.getItem("accessToken");
       tokenHeader.authorization = `Bearer ${token}`;
     }
-    let newheaders = headers ? { ...headers, ...tokenHeader } : {
-      "Content-Type": "application/json; charset=utf-8",
-      ...tokenHeader
-    };
+    let newheaders = headers
+      ? { ...headers, ...tokenHeader }
+      : {
+          "Content-Type": "application/json; charset=utf-8",
+          ...tokenHeader,
+        };
 
-    if (authRequired && method.toUpperCase() == "POST") {
-      headers["Content-Type"] = "multipart/form-data"
+    if (method.toUpperCase() == "POST") {
+      headers["Content-Type"] = "multipart/form-data";
     }
 
     let newparams = {};
@@ -177,7 +180,6 @@ const useFetchAPI = (
           .post(fullurl, newbody, {
             headers: {
               ...newheaders,
-
             },
           })
           .then(isAsync ? thenSuccessHandlerAsync : thenSuccessHandler)
