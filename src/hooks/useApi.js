@@ -40,19 +40,10 @@ export const useApi = () => {
           body: body ? JSON.stringify(body) : null,
         });
 
-        let data;
-        const contentType = response.headers.get('content-type');
-        
-        // Only try to parse as JSON if the response is JSON
-        if (contentType && contentType.includes('application/json')) {
-          data = await response.json();
-        } else {
-          const text = await response.text();
-          throw new Error(`Unexpected response format: ${text}`);
-        }
+        const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || `Request failed with status ${response.status}`);
+          throw new Error(data.message || "Request failed");
         }
 
         return data;

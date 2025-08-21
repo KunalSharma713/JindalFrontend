@@ -1,107 +1,52 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useApi } from "../../hooks/useApi";
-const BASE_URL = "https://store-plate-backend.vercel.app/api/";
-
-// const BASE_URL = "http://localhost:5000/api/";
-// Check if we have a token in localStorage
-const token = localStorage.getItem("accessToken");
-const userData = localStorage.getItem("user");
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  user: userData ? JSON.parse(userData) : null,
-  isAuthenticated: !!token,
+  user: {
+    id: 1,
+    name: 'John Doe',
+    email: 'john.doe@admin.com',
+    role: 'Super Admin',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facepad&facepad=2&w=256&h=256&q=80',
+    permissions: ['all']
+  },
+  isAuthenticated: true,
   loading: false,
-  error: null,
-};
-
-// Async thunk to check authentication status
-export const checkAuth = createAsyncThunk(
-  "auth/checkAuth",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${BASE_URL}auth/verify-token`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
-      }
-
-      // Save user data to localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
-      return data.user;
-    } catch (error) {
-      // Clear invalid token
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      return rejectWithValue(error.message);
-    }
-  }
-);
+  error: null
+}
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
-  extraReducers: (builder) => {
-    builder
-      .addCase(checkAuth.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(checkAuth.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
-      .addCase(checkAuth.rejected, (state, action) => {
-        state.loading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-        state.error = action.payload;
-      });
-  },
   reducers: {
     loginStart: (state) => {
-      state.loading = true;
-      state.error = null;
+      state.loading = true
+      state.error = null
     },
     loginSuccess: (state, action) => {
-      state.loading = false;
-      state.isAuthenticated = true;
-      state.user = action.payload;
-      state.error = null;
-      // Save user data to localStorage
-      localStorage.setItem("user", JSON.stringify(action.payload));
+      state.loading = false
+      state.isAuthenticated = true
+      state.user = action.payload
+      state.error = null
     },
     loginFailure: (state, action) => {
-      state.loading = false;
-      state.isAuthenticated = false;
-      state.user = null;
-      state.error = action.payload;
+      state.loading = false
+      state.isAuthenticated = false
+      state.user = null
+      state.error = action.payload
     },
     logout: (state) => {
-      state.isAuthenticated = false;
-      state.user = null;
-      state.error = null;
-      // Clear localStorage on logout
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
+      state.isAuthenticated = false
+      state.user = null
+      state.error = null
     },
     updateProfile: (state, action) => {
-      state.user = { ...state.user, ...action.payload };
+      state.user = { ...state.user, ...action.payload }
     },
     clearError: (state) => {
-      state.error = null;
-    },
-  },
-});
+      state.error = null
+    }
+  }
+})
 
 export const {
   loginStart,
@@ -109,7 +54,7 @@ export const {
   loginFailure,
   logout,
   updateProfile,
-  clearError,
-} = authSlice.actions;
+  clearError
+} = authSlice.actions
 
-export default authSlice.reducer;
+export default authSlice.reducer

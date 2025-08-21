@@ -8,7 +8,6 @@ import UserModal from '../../components/UserManagement/UserModal';
 import {useApi} from '../../hooks/useApi';
 
 const UserManagement = () => {
-  console.log('Rendering UserManagement component');
   const dispatch = useDispatch();
   const { apiRequest } = useApi();
   
@@ -38,13 +37,7 @@ const UserManagement = () => {
         ...filters,
       });
   
-      console.log('Fetching users with params:', params.toString());
       const response = await apiRequest(`user/?${params}`, 'GET');
-      console.log('API Response:', response);
-      
-      if (!response) {
-        throw new Error('No response received from server');
-      }
       
       if (response && response.data) {
         // Transform data to match DataTable expected format
@@ -55,13 +48,11 @@ const UserManagement = () => {
         }));
   
         setUsers(transformedUsers);
-        if (response.pagination) {
-          setPagination(prev => ({
-            ...prev,
-            total: response.pagination.total,
-            totalPages: response.pagination.totalPages,
-          }));
-        }
+        setPagination(prev => ({
+          ...prev,
+          total: response.pagination.total,
+          totalPages: response.pagination.totalPages,
+        }));
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -173,9 +164,6 @@ const UserManagement = () => {
       ),
     },
   ];
-
-  console.log('Users data:', users);
-  console.log('Loading state:', loading);
 
   return (
     <div className="space-y-6">
