@@ -1,9 +1,9 @@
 import { useState, useCallback } from "react";
 
 //Prod
-// const BASE_URL = "https://store-plate-backend.vercel.app/api/";
+const BASE_URL = "https://store-plate-backend.vercel.app/api/";
 
-const BASE_URL = "http://localhost:5000/api/";
+// const BASE_URL = "http://localhost:5000/api/";
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
