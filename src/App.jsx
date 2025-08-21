@@ -1,97 +1,36 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { isExpired } from "react-jwt";
-import {
-  LoginAction,
-  LogOutAction,
-  PlantSelectionAction,
-} from "../src/store/slices/LoginSlice";
-import "./App.css";
-import LocalStorageHelper from "./services/LocalStorageHelper";
-import useFetchAPI from "./hooks/useFetchAPI";
-import LoadingScreen from "./components/loaders/LoadingScreen";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppRoutes } from "./routes-navs/AppRoutes";
-import MainLayout from "./layouts/MainLayout";
+import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import Layout from './components/Layout/Layout'
+import Dashboard from './pages/Dashboard/Dashboard'
+import UserManagement from './pages/UserManagement/UserManagement'
+import ProjectListing from './pages/ProjectManagement/ProjectListing'
+import ProjectDetails from './pages/ProjectManagement/ProjectDetails'
+import PermissionsManagement from './pages/PermissionsManagement/PermissionsManagement'
+import Profile from './pages/Profile/Profile'
+import Login from './pages/Auth/Login'
+
 function App() {
-  const { isLoggedIn } = useSelector((state) => state.LoginReducer);
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
-  console.log(import.meta.env.VITE_API_URL);
+  const { isAuthenticated } = useSelector((state) => state.auth)
 
-  // const [_, PlantsFetchHandler] = useFetchAPI(
-  //   {
-  //     url: `/plant`,
-  //     method: "GET",
-  //   },
-  //   (res) => {
-  //     const selectedPlant = LocalStorageHelper.getItem("selectedPlant");
-  //     const allPlants = res?.Plant ?? [];
-
-  //     dispatch(SetPlantsAction(allPlants));
-
-  //     const validatedPlant = allPlants.find(
-  //       (item) => item?._id === selectedPlant?._id
-  //     );
-
-  //     dispatch(PlantSelectionAction(validatedPlant ?? allPlants?.[0] ?? null));
-  //     return res;
-  //   },
-  //   (err) => {
-  //     return err?.response ?? true;
-  //   }
-  // );
-
-  const starterFunction = async () => {
-    const token = LocalStorageHelper.getItem("accessToken") ?? null;
-    const refreshToken = LocalStorageHelper.getItem("refreshToken") ?? null;
-    const isTokenExpired = token ? isExpired(token) : true;
-    const isRefreshTokenExpired = refreshToken ? isExpired(refreshToken) : true;
-    if (isRefreshTokenExpired) {
-      dispatch(LogOutAction());
-    } else if (isTokenExpired) {
-      // refresh token call
-    } else {
-      // get userdetails
-    }
-  };
-
-  useEffect(() => {
-    const loadApp = async () => {
-      const MIN_LOADING_TIME = 1000; // 2 seconds
-      const start = Date.now();
-
-      await starterFunction();
-
-      const elapsed = Date.now() - start;
-      const remainingTime = MIN_LOADING_TIME - elapsed;
-
-      if (remainingTime > 0) {
-        setTimeout(() => setLoading(false), remainingTime);
-      } else {
-        setLoading(false);
-      }
-    };
-
-    loadApp();
-  }, []);
-
-  if (loading) {
-    return <LoadingScreen />;
+  if (!isAuthenticated) {
+    return <Login />
   }
+
   return (
-    <BrowserRouter>
+    <Layout>
       <Routes>
-        {isLoggedIn ? (
-          <Route path="/*" element={<LayoutMain />} />
-        ) : (
-          AppRoutes.map((item, index) => (
-            <Route path={item.path} key={index} element={item.element} />
-          ))
-        )}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/projects" element={<ProjectListing />} />
+        <Route path="/projects/:id" element={<ProjectDetails />} />
+        <Route path="/permissions" element={<PermissionsManagement />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-    </BrowserRouter>
-  );
+    </Layout>
+  )
 }
 
-export default App;
+export default App
