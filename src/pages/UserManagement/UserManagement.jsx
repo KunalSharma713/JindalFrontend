@@ -8,6 +8,7 @@ import UserModal from '../../components/UserManagement/UserModal';
 import {useApi} from '../../hooks/useApi';
 
 const UserManagement = () => {
+  console.log('Rendering UserManagement component');
   const dispatch = useDispatch();
   const { apiRequest } = useApi();
   
@@ -164,6 +165,9 @@ const UserManagement = () => {
       ),
     },
   ];
+
+  console.log('Users data:', users);
+  console.log('Loading state:', loading);
 
   return (
     <div className="space-y-6">

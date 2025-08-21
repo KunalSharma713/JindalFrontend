@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -24,6 +25,7 @@ const schema = yup.object({
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { apiRequest, loading, error } = useApi();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,7 +42,6 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log("data", data)
     try {
       const response = await apiRequest("auth/login", "POST", data, false);
       if (response) {
@@ -48,8 +49,14 @@ const Login = () => {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         
+        // Save user data to localStorage
+        localStorage.setItem('user', JSON.stringify(response.user));
+        
         // Dispatch user data to Redux store
         dispatch(loginSuccess(response.user));
+        
+        // Navigate to dashboard
+        navigate('/dashboard');
         toast.success('Login successful!');
       }
     } catch (err) {
