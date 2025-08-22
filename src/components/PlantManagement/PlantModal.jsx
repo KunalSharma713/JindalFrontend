@@ -10,6 +10,7 @@ const schema = yup.object({
   warehouse_name: yup.string().required("Warehouse name is required"),
   lat: yup.number().typeError("Latitude must be a number").nullable(),
   long: yup.number().typeError("Longitude must be a number").nullable(),
+  code: yup.string().required("Code is required"),
 });
 
 const PlantModal = ({ isOpen, onClose, warehouse }) => {
@@ -27,6 +28,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
       warehouse_name: "",
       lat: null,
       long: null,
+      code: "",
     },
   });
 
@@ -36,12 +38,14 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
         warehouse_name: warehouse.warehouse_name || "",
         lat: warehouse.lat || null,
         long: warehouse.long || null,
+        code: warehouse.code || "",
       });
     } else {
       reset({
         warehouse_name: "",
         lat: null,
         long: null,
+        code: "",
       });
     }
   }, [warehouse, reset]);
@@ -50,15 +54,15 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
     try {
       if (isEditing) {
         await apiRequest(`warehouse/${warehouse._id}`, "PUT", data);
-        toast.success("Warehouse updated successfully!");
+        toast.success("Plant updated successfully!");
       } else {
         await apiRequest("warehouse", "POST", data);
-        toast.success("Warehouse created successfully!");
+        toast.success("Plant created successfully!");
       }
       onClose();
     } catch (error) {
-      console.error("Error saving warehouse:", error);
-      toast.error(error.response?.data?.message || "Failed to save warehouse");
+      console.error("Error saving plant:", error);
+      toast.error(error.response?.data?.message || "Failed to save plant");
     }
   };
 
@@ -106,11 +110,30 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
                   className={`w-full px-3 py-2 border ${
                     errors.warehouse_name ? "border-red-300" : "border-gray-300"
                   } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
-                  placeholder="Enter warehouse name"
+                  placeholder="Enter plant name"
                 />
                 {errors.warehouse_name && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.warehouse_name.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Code
+                </label>
+                <input
+                  type="text"
+                  {...register("code")}
+                  className={`w-full px-3 py-2 border ${
+                    errors.code ? "border-red-300" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
+                  placeholder="Enter code"
+                />
+                {errors.code && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.code.message}
                   </p>
                 )}
               </div>
