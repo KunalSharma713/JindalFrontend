@@ -5,6 +5,7 @@ import { loginSuccess } from './store/slices/authSlice';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import UserManagement from './pages/UserManagement/UserManagement';
+import PlantManagement from './pages/PlantManagement/PlantManagement';
 import ProjectListing from './pages/ProjectManagement/ProjectListing';
 import ProjectDetails from './pages/ProjectManagement/ProjectDetails';
 import PermissionsManagement from './pages/PermissionsManagement/PermissionsManagement';
@@ -73,6 +74,7 @@ function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<UserManagement />} />
+        <Route path="/plants" element={<PlantManagement />} />
         <Route path="/projects" element={<ProjectListing />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
         <Route path="/permissions" element={<PermissionsManagement />} />

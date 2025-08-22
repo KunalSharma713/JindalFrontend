@@ -8,7 +8,7 @@ import {
   Shield,
   User,
   X,
-  BarChart3,
+  Factory,
 } from "lucide-react";
 import stlLogo from "../../assets/jindal-steel-logo.png";
 
@@ -19,8 +19,9 @@ const Sidebar = ({ isOpen, onClose }) => {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "User Management", href: "/users", icon: Users },
-    { name: "Projects", href: "/projects", icon: FolderOpen },
-    { name: "Permissions", href: "/permissions", icon: Shield },
+    { name: "Plant Management", href: "/plants", icon: Factory },
+    // { name: "Projects", href: "/projects", icon: FolderOpen },
+    // { name: "Permissions", href: "/permissions", icon: Shield },
     { name: "Profile", href: "/profile", icon: User },
   ];
 
