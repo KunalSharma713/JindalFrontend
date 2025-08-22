@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 
 //Prod
-const BASE_URL = "https://store-plate-backend.vercel.app/api/";
+const BASE_URL = "https://bhoomiapps.thevivapower.com/api/";
 
 // const BASE_URL = "http://localhost:5000/api/";
 
