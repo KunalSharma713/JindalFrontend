@@ -1,15 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// Check for existing auth state on initial load
+const token = localStorage.getItem('accessToken');
+const userData = localStorage.getItem('user');
+
 const initialState = {
-  user: {
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@admin.com',
-    role: 'Super Admin',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facepad&facepad=2&w=256&h=256&q=80',
-    permissions: ['all']
-  },
-  isAuthenticated: true,
+  user: userData ? JSON.parse(userData) : null,
+  isAuthenticated: !!token,
   loading: false,
   error: null
 }
@@ -23,10 +20,18 @@ const authSlice = createSlice({
       state.error = null
     },
     loginSuccess: (state, action) => {
-      state.loading = false
-      state.isAuthenticated = true
-      state.user = action.payload
-      state.error = null
+      const { user, token } = action.payload;
+      state.loading = false;
+      state.isAuthenticated = true;
+      state.user = user;
+      state.token = token;
+      state.error = null;
+      
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
     },
     loginFailure: (state, action) => {
       state.loading = false
@@ -35,9 +40,18 @@ const authSlice = createSlice({
       state.error = action.payload
     },
     logout: (state) => {
-      state.isAuthenticated = false
-      state.user = null
-      state.error = null
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+      }
+      
+      // Reset state
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      state.error = null;
     },
     updateProfile: (state, action) => {
       state.user = { ...state.user, ...action.payload }

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { loginSuccess } from "../../store/slices/authSlice";
 import { useApi } from "../../hooks/useApi";
+import { useNavigate, useLocation } from 'react-router-dom';
 import stlLogo from "../../assets/jindal-steel-logo.png";
 
 const schema = yup.object({
@@ -24,6 +25,9 @@ const schema = yup.object({
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
   const { apiRequest, loading, error } = useApi();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,17 +44,32 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log("data", data)
     try {
       const response = await apiRequest("auth/login", "POST", data, false);
-      if (response) {
-        // Save tokens to localStorage
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
+      console.log('Login response:', response); // Debug log
+      
+      if (response && response.accessToken) {
+        const { accessToken, refreshToken, user } = response;
         
-        // Dispatch user data to Redux store
-        dispatch(loginSuccess(response.user));
+        if (!accessToken || !user) {
+          throw new Error('Invalid response from server');
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('accessToken', accessToken);
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        // Dispatch login success
+        dispatch(loginSuccess({ 
+          token: accessToken, 
+          user: user
+        }));
+        
         toast.success('Login successful!');
+        navigate(from, { replace: true });
       }
     } catch (err) {
       toast.error(err.message || 'An error occurred during login.');

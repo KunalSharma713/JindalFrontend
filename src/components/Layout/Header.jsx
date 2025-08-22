@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom';
 import { Menu, Bell, Search, LogOut } from 'lucide-react'
 import { logout } from '../../store/slices/authSlice'
 
@@ -7,8 +8,11 @@ const Header = ({ onMenuClick }) => {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    dispatch(logout())
+    dispatch(logout());
+    navigate('/login', { replace: true });
   }
 
   return (
