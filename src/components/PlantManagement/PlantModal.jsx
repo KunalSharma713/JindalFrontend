@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useApi } from "../../hooks/useApi";
 
 const schema = yup.object({
-  warehouse_name: yup.string().required("Warehouse name is required"),
+  warehouse_name: yup.string().required("Plant name is required"),
   lat: yup.number().typeError("Latitude must be a number").nullable(),
   long: yup.number().typeError("Longitude must be a number").nullable(),
   code: yup.string().required("Code is required"),

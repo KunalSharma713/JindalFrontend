@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { Plus, Edit3, Trash2 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { setSelectedUser } from '../../store/slices/usersSlice';
-import DataTable from '../../components/DataTable';
-import UserModal from '../../components/UserManagement/UserModal';
-import {useApi} from '../../hooks/useApi';
+import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { Plus, Edit3, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { setSelectedUser } from "../../store/slices/usersSlice";
+import DataTable from "../../components/DataTable";
+import UserModal from "../../components/UserManagement/UserModal";
+import { useApi } from "../../hooks/useApi";
 
 const UserManagement = () => {
   const dispatch = useDispatch();
   const { apiRequest } = useApi();
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const UserManagement = () => {
     total: 0,
     totalPages: 1,
   });
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [filters, setFilters] = useState({});
 
   const fetchUsers = useCallback(async () => {
@@ -28,7 +28,7 @@ const UserManagement = () => {
       setLoading(true);
       const { page, limit } = pagination;
       const { key, direction } = sortConfig;
-      
+
       // Build query params
       const params = new URLSearchParams({
         page,
@@ -36,32 +36,31 @@ const UserManagement = () => {
         ...(key && { sortBy: key, sortOrder: direction }),
         ...filters,
       });
-  
-      const response = await apiRequest(`user/?${params}`, 'GET');
-      
+
+      const response = await apiRequest(`user/?${params}`, "GET");
+
       if (response && response.data) {
         // Transform data to match DataTable expected format
-        const transformedUsers = response.data.map(user => ({
+        const transformedUsers = response.data.map((user) => ({
           ...user,
           name: `${user.first_name} ${user.last_name}`,
-          role: user.roleid?.name || 'N/A',
+          role: user.roleid?.name || "N/A",
         }));
-  
+
         setUsers(transformedUsers);
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
           total: response.pagination.total,
           totalPages: response.pagination.totalPages,
         }));
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, sortConfig, filters, apiRequest]);
-  
+  }, [pagination.page, pagination.limit, sortConfig, filters]);
 
   useEffect(() => {
     fetchUsers();
@@ -78,20 +77,20 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await apiRequest(`user/${userId}`, 'DELETE');
-        toast.success('User deleted successfully');
+        await apiRequest(`user/${userId}`, "DELETE");
+        toast.success("User deleted successfully");
         fetchUsers(); // Refresh the list
       } catch (error) {
-        console.error('Error deleting user:', error);
-        toast.error('Failed to delete user');
+        console.error("Error deleting user:", error);
+        toast.error("Failed to delete user");
       }
     }
   };
 
   const handlePageChange = (page) => {
-    setPagination(prev => ({ ...prev, page }));
+    setPagination((prev) => ({ ...prev, page }));
   };
 
   const handleSort = ({ key, direction }) => {
@@ -100,31 +99,31 @@ const UserManagement = () => {
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
   };
 
   const columns = [
     {
-      key: 'name',
-      title: 'Name',
+      key: "name",
+      title: "Name",
       sortable: true,
       filterable: true,
     },
     {
-      key: 'email',
-      title: 'Email',
+      key: "email",
+      title: "Email",
       sortable: true,
       filterable: true,
     },
     {
-      key: 'mobile_no',
-      title: 'Phone',
+      key: "mobile_no",
+      title: "Phone",
       sortable: true,
       filterable: true,
     },
     {
-      key: 'role',
-      title: 'Role',
+      key: "role",
+      title: "Role",
       sortable: true,
       filterable: true,
     },
@@ -142,8 +141,8 @@ const UserManagement = () => {
     //   ),
     // },
     {
-      key: 'actions',
-      title: 'Actions',
+      key: "actions",
+      title: "Actions",
       render: (_, row) => (
         <div className="flex space-x-2">
           <button
@@ -209,13 +208,13 @@ const UserManagement = () => {
       </div>
 
       {/* User Modal */}
-      <UserModal 
-        isOpen={isModalOpen} 
+      <UserModal
+        isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           dispatch(setSelectedUser(null));
           fetchUsers(); // Refresh data after modal closes
-        }} 
+        }}
       />
     </div>
   );
