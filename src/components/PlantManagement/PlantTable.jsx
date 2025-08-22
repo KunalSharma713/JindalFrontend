@@ -59,11 +59,7 @@ const PlantTable = ({
   }
 
   return (
-    <div className="card overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">Plants ({warehouses.length})</h3>
-      </div>
-      
+    <div className="card overflow-hidden"> 
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full align-middle">
           <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">

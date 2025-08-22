@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import toast from 'react-hot-toast';
-import { X } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import toast from "react-hot-toast";
+import { X } from "lucide-react";
+import { useApi } from "../../hooks/useApi";
 
 const schema = yup.object({
-  warehouse_name: yup.string().required('Warehouse name is required'),
-  lat: yup.number().typeError('Latitude must be a number').nullable(),
-  long: yup.number().typeError('Longitude must be a number').nullable(),
+  warehouse_name: yup.string().required("Warehouse name is required"),
+  lat: yup.number().typeError("Latitude must be a number").nullable(),
+  long: yup.number().typeError("Longitude must be a number").nullable(),
 });
 
 const PlantModal = ({ isOpen, onClose, warehouse }) => {
@@ -20,26 +20,26 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      warehouse_name: '',
+      warehouse_name: "",
       lat: null,
       long: null,
-    }
+    },
   });
 
   useEffect(() => {
     if (warehouse) {
       reset({
-        warehouse_name: warehouse.warehouse_name || '',
+        warehouse_name: warehouse.warehouse_name || "",
         lat: warehouse.lat || null,
         long: warehouse.long || null,
       });
     } else {
       reset({
-        warehouse_name: '',
+        warehouse_name: "",
         lat: null,
         long: null,
       });
@@ -49,16 +49,16 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
   const onSubmit = async (data) => {
     try {
       if (isEditing) {
-        await apiRequest(`warehouse/${warehouse._id}`, 'PUT', data);
-        toast.success('Warehouse updated successfully!');
+        await apiRequest(`warehouse/${warehouse._id}`, "PUT", data);
+        toast.success("Warehouse updated successfully!");
       } else {
-        await apiRequest('warehouse', 'POST', data);
-        toast.success('Warehouse created successfully!');
+        await apiRequest("warehouse", "POST", data);
+        toast.success("Warehouse created successfully!");
       }
       onClose();
     } catch (error) {
-      console.error('Error saving warehouse:', error);
-      toast.error(error.response?.data?.message || 'Failed to save warehouse');
+      console.error("Error saving warehouse:", error);
+      toast.error(error.response?.data?.message || "Failed to save warehouse");
     }
   };
 
@@ -72,15 +72,20 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={handleClose} />
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          onClick={handleClose}
+        />
 
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+        <span className="hidden sm:inline-block sm:align-middle sm:h-screen">
+          &#8203;
+        </span>
 
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">
-                {isEditing ? 'Edit Warehouse' : 'Add New Warehouse'}
+                {isEditing ? "Edit Plant" : "Add New Plant"}
               </h3>
               <button
                 onClick={handleClose}
@@ -92,38 +97,62 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Warehouse Name</label>
-                <input 
-                  type="text" 
-                  {...register('warehouse_name')} 
-                  className={`w-full px-3 py-2 border ${errors.warehouse_name ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`} 
-                  placeholder="Enter warehouse name" 
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Plant Name
+                </label>
+                <input
+                  type="text"
+                  {...register("warehouse_name")}
+                  className={`w-full px-3 py-2 border ${
+                    errors.warehouse_name ? "border-red-300" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
+                  placeholder="Enter warehouse name"
                 />
-                {errors.warehouse_name && <p className="mt-1 text-sm text-red-600">{errors.warehouse_name.message}</p>}
+                {errors.warehouse_name && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.warehouse_name.message}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                  <input 
-                    type="number" 
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
                     step="any"
-                    {...register('lat')} 
-                    className={`w-full px-3 py-2 border ${errors.lat ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`} 
-                    placeholder="Enter latitude (optional)" 
+                    {...register("lat")}
+                    className={`w-full px-3 py-2 border ${
+                      errors.lat ? "border-red-300" : "border-gray-300"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
+                    placeholder="Enter latitude (optional)"
                   />
-                  {errors.lat && <p className="mt-1 text-sm text-red-600">{errors.lat.message}</p>}
+                  {errors.lat && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.lat.message}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                  <input 
-                    type="number" 
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
                     step="any"
-                    {...register('long')} 
-                    className={`w-full px-3 py-2 border ${errors.long ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`} 
-                    placeholder="Enter longitude (optional)" 
+                    {...register("long")}
+                    className={`w-full px-3 py-2 border ${
+                      errors.long ? "border-red-300" : "border-gray-300"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
+                    placeholder="Enter longitude (optional)"
                   />
-                  {errors.long && <p className="mt-1 text-sm text-red-600">{errors.long.message}</p>}
+                  {errors.long && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.long.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
@@ -132,7 +161,11 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
                   disabled={loading}
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:col-start-2 sm:text-sm disabled:opacity-50"
                 >
-                  {loading ? 'Saving...' : isEditing ? 'Update Warehouse' : 'Add Warehouse'}
+                  {loading
+                    ? "Saving..."
+                    : isEditing
+                    ? "Update Plant"
+                    : "Add Plant"}
                 </button>
                 <button
                   type="button"
