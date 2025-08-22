@@ -124,7 +124,6 @@ const PlantTable = ({
                   <tr key={warehouse._id} className="hover:bg-gray-50">
                     <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <div className="flex items-center">
-                        <Warehouse className="h-5 w-5 text-blue-600 mr-2" />
                         <div>
                           <div className="font-medium text-gray-900">
                             {warehouse.warehouse_name}
