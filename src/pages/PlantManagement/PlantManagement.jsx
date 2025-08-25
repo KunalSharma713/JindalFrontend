@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import PlantModal from "../../components/PlantManagement/PlantModal";
 import DataTable from "../../components/DataTable";
@@ -153,7 +153,7 @@ const PlantManagement = () => {
               className="text-blue-600 hover:text-blue-900"
               title="Edit warehouse"
             >
-              <Edit className="h-4 w-4" />
+              <Edit3 className="h-4 w-4" />
             </button>
             <button
               onClick={(e) => {

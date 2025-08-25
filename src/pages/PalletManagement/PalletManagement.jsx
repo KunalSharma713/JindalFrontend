@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Edit3, Trash2, MapPin } from "lucide-react";
+import { Plus, Edit3, Trash2, MapPin, PackagePlus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import DataTable from "../../components/DataTable";
-import PalletModal from "../../components/PalletManagement/PalletModal";
+import AssignPalletModal from "../../components/PalletManagement/AssignPalletModal";
 import { useApi } from "../../hooks/useApi";
 
 const PalletManagement = () => {
   const dispatch = useDispatch();
   const { apiRequest } = useApi();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [barcodesAndPallets, setBarcodesAndPallets] = useState([]);
+  const [selectedBarcode, setSelectedBarcode] = useState(null);
+  console.log("selectedBarcode", selectedBarcode);
+  const [selectedPallet, setSelectedPallet] = useState(null);
   const [locations, setLocations] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -20,15 +24,36 @@ const PalletManagement = () => {
     totalPages: 1,
   });
   const [sortConfig, setSortConfig] = useState({
-    key: "location_name",
+    key: "barcode_key",
     direction: "asc",
   });
   const [filters, setFilters] = useState({});
   const [currentWarehouse, setCurrentWarehouse] = useState(() => {
     const warehouseId = localStorage.getItem("selectedPlantId");
-    return warehouseId ? { _id: warehouseId } : null;
+    const warehouseName = localStorage.getItem("selectedPlantName");
+    return warehouseId ? { _id: warehouseId, name: warehouseName } : null;
   });
+  const [isGenerating, setIsGenerating] = useState(false);
   const fetchLocations = useCallback(async () => {
+    try {
+      setLoading(true);
+      const warehouseId = localStorage.getItem("selectedPlantId");
+      const response = await apiRequest(
+        `location?warehouse=${warehouseId}`,
+        "GET"
+      );
+      if (response && response.data) {
+        setLocations(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      toast.error("Failed to fetch locations");
+    } finally {
+      setLoading(false);
+    }
+  }, [apiRequest]);
+
+  const fetchBarcodesAndPallets = useCallback(async () => {
     try {
       setLoading(true);
       const { page, limit } = pagination;
@@ -36,7 +61,7 @@ const PalletManagement = () => {
       const warehouseId = localStorage.getItem("selectedPlantId");
 
       if (!warehouseId) {
-        setLocations([]);
+        setBarcodesAndPallets([]);
         return;
       }
 
@@ -49,21 +74,32 @@ const PalletManagement = () => {
         warehouse: warehouseId,
       });
 
-      const response = await apiRequest(`location/?${params}`, "GET");
+      const response = await apiRequest(`pallet/all?${params}`, "GET");
 
       if (response && response.data) {
         // Transform data to match DataTable expected format
-        const transformedData = response.data.map((location) => ({
-          ...location,
-          id: location._id,
-          warehouseName: location.warehouse?.name || "N/A",
-          coordinates:
-            location.lat && location.long
-              ? `${location.lat.toFixed(4)}, ${location.long.toFixed(4)}`
-              : "Not set",
-        }));
+        const transformedData = response.data.map((item) => {
+          const pallet = item.pallet || {};
+          return {
+            ...item,
+            id: item._id,
+            // Map pallet fields
+            pallet_id: pallet?._id,
+            sequenceNumber: pallet?.sequenceNumber,
+            sequence: pallet?.sequence,
+            size: pallet?.size,
+            last_moved_date: pallet?.last_moved_date,
+            quantity: pallet?.quantity,
+            // Map location name from nested object
+            location_name: pallet?.location?.location_name ?? "",
+            location: pallet?.location?._id ?? null,
+            // Keep barcode and status at root level
+            barcode_key: item.barcode_key,
+            status: item.status ?? "",
+          };
+        });
 
-        setLocations(transformedData);
+        setBarcodesAndPallets(transformedData);
         setPagination((prev) => ({
           ...prev,
           total: response.pagination?.total || response.data.length,
@@ -71,18 +107,30 @@ const PalletManagement = () => {
         }));
       }
     } catch (error) {
-      console.error("Error fetching locations:", error);
-      toast.error("Failed to fetch locations");
+      console.error("Error fetching Barcodes And Pallets:", error);
+      toast.error("Failed to fetch Barcodes And Pallets");
     } finally {
       setLoading(false);
     }
   }, [
+    apiRequest,
     pagination.page,
     pagination.limit,
     sortConfig,
     filters,
     currentWarehouse,
   ]);
+
+  // Fetch both locations and barcodes on mount and when warehouse changes
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([fetchLocations(), fetchBarcodesAndPallets()]);
+    };
+
+    if (currentWarehouse?._id) {
+      fetchData();
+    }
+  }, [currentWarehouse, fetchLocations, fetchBarcodesAndPallets]);
 
   // Update currentWarehouse when selectedPlantId changes in localStorage
   useEffect(() => {
@@ -117,23 +165,65 @@ const PalletManagement = () => {
     currentWarehouse,
   ]);
 
-  const handleAddLocation = () => {
-    setSelectedLocation(null);
-    setIsModalOpen(true);
+  const handleGenerateBarcode = async () => {
+    if (!currentWarehouse?._id) {
+      toast.error("Please select a warehouse first");
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      // Send count as a query parameter as expected by the backend
+      const response = await apiRequest(
+        `pallet-barcode/generate?count=1`, // Generate one barcode at a time
+        "POST",
+        {}, // Empty body since we're using query params
+        true // authRequired
+      );
+
+      if (response && response.message) {
+        toast.success(response.message);
+        // Refresh the barcodesAndPallets list to show the new barcode
+        fetchBarcodesAndPallets();
+        fetchLocations();
+      } else {
+        throw new Error(response?.message || "Failed to generate barcode");
+      }
+    } catch (error) {
+      console.error("Error generating barcode:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to generate barcode"
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const handleEdit = (location) => {
-    if (!location) return;
-    setSelectedLocation({
-      ...location,
-      // Ensure all required fields have proper defaults if they're null/undefined
-      location_name: location.location_name || "",
-      barcode_key: location.barcode_key || "",
-      lat: location.lat || null,
-      long: location.long || null,
-      warehouse: location.warehouse?._id || warehouseId || "",
+  const handleAssign = (barcode) => {
+    setSelectedBarcode(barcode);
+    setSelectedPallet(null);
+    setIsAssignModalOpen(true);
+  };
+
+  const handleEdit = (row) => {
+    setSelectedBarcode(row);
+    setSelectedPallet({
+      pallet_id: row.pallet_id,
+      _id: row._id,
+      location: row.location?._id || row.location,
+      size: row.size,
+      quantity: row.quantity,
     });
-    setIsModalOpen(true);
+    setIsAssignModalOpen(true);
+  };
+
+  const closeAssignModal = () => {
+    setIsAssignModalOpen(false);
+    // Small delay to allow modal to close before resetting state
+    setTimeout(() => {
+      setSelectedPallet(null);
+      setSelectedBarcode(null);
+    }, 300);
   };
 
   const handleDelete = async (locationId) => {
@@ -155,9 +245,44 @@ const PalletManagement = () => {
     }
   };
 
-  const handleLocationCreated = () => {
-    fetchLocations();
+  const handlePalletAssigned = async (data) => {
+    try {
+      let response;
+
+      if (selectedPallet?._id) {
+        // Update existing pallet
+        response = await apiRequest(
+          `pallet/${selectedPallet.pallet_id}`,
+          "PUT",
+          {
+            ...data,
+            _id: selectedPallet.pallet_id, // Ensure ID is included in the update
+          }
+        );
+        toast.success("Pallet updated successfully");
+      } else if (selectedBarcode) {
+        // Assign new pallet
+        response = await apiRequest("pallet/assign", "POST", {
+          ...data,
+          barcode_key: selectedBarcode.barcode_key,
+          barcodeId: selectedBarcode._id,
+        });
+        toast.success("Pallet assigned successfully");
+      } else {
+        throw new Error("No pallet or barcode selected");
+      }
+
+      if (response) {
+        fetchBarcodesAndPallets();
+        return true;
+      }
+    } catch (error) {
+      console.error("Error processing pallet:", error);
+      toast.error(error.response?.data?.message || "Error processing pallet");
+      throw error;
+    }
   };
+
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, page }));
@@ -178,54 +303,100 @@ const PalletManagement = () => {
 
   const columns = [
     {
-      key: "location_name",
-      title: "Location Name",
-      sortable: true,
-    },
-    {
       key: "barcode_key",
       title: "Barcode",
       sortable: true,
     },
     {
-      key: "lat",
-      title: "Latitude",
+      key: "status",
+      title: "Status",
+      sortable: true,
+      render: (status) => (
+        <span
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            status === "assigned"
+              ? "bg-green-100 text-green-800"
+              : status === "new"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {status ? status.toUpperCase() : ""}
+        </span>
+      ),
     },
     {
-      key: "long",
-      title: "Longitude",
+      key: "sequenceNumber",
+      title: "Sequence Number",
+      sortable: true,
+    },
+    {
+      key: "sequence",
+      title: "Sequence",
+      sortable: true,
+    },
+    {
+      key: "size",
+      title: "Size",
+      sortable: true,
+    },
+    {
+      key: "last_moved_date",
+      title: "Last Moved",
+      sortable: true,
+      render: (date) => (date ? new Date(date).toLocaleDateString() : ""),
+    },
+    {
+      key: "quantity",
+      title: "Quantity",
+      sortable: true,
+      render: (qty) => qty?.toLocaleString() || "0",
+    },
+    {
+      key: "location_name",
+      title: "Location",
+      sortable: true,
     },
     {
       key: "actions",
       title: "Actions",
-      render: (_, row) => {
-        if (!row) return null;
-
-        return (
-          <div className="flex space-x-2">
+      render: (_, row) => (
+        <div className="flex space-x-2">
+          {!row.pallet ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAssign(row);
+              }}
+              className="text-green-600 hover:text-green-900"
+              title="Assign pallet"
+            >
+              <PackagePlus className="h-4 w-4" />
+            </button>
+          ) : (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleEdit(row);
               }}
               className="text-blue-600 hover:text-blue-900"
-              title="Edit location"
+              title="Edit pallet"
             >
               <Edit3 className="h-4 w-4" />
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(row._id || row.id);
-              }}
-              className="text-red-600 hover:text-red-900"
-              title="Delete location"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        );
-      },
+          )}
+          {/* <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(row._id || row.id);
+            }}
+            className="text-red-600 hover:text-red-900"
+            title="Delete pallet"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button> */}
+        </div>
+      ),
     },
   ];
 
@@ -241,18 +412,48 @@ const PalletManagement = () => {
             <p className="mt-1 text-sm text-gray-500">
               {currentWarehouse
                 ? `Managing pallets for ${currentWarehouse.name}`
-                : "Select a warehouse to manage locations"}
+                : "Select a warehouse to manage barcodesAndPallets"}
             </p>
           </div>
         </div>
         <div className="mt-4 flex md:mt-0 md:ml-4">
           <button
             type="button"
-            onClick={handleAddLocation}
-            className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            onClick={handleGenerateBarcode}
+            disabled={isGenerating}
+            className={`ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              isGenerating
+                ? "bg-primary-400"
+                : "bg-primary-600 hover:bg-primary-700"
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
           >
-            <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Add Pallet
+            {isGenerating ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Generating...
+              </>
+            ) : (
+              <>Generate Barcode</>
+            )}
           </button>
         </div>
       </div>
@@ -274,7 +475,7 @@ const PalletManagement = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={locations}
+            data={barcodesAndPallets}
             loading={loading}
             pagination={pagination}
             onPageChange={handlePageChange}
@@ -308,15 +509,14 @@ const PalletManagement = () => {
       </div>
 
       {/* Pallet Modal */}
-      <PalletModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedLocation(null);
-        }}
-        onSuccess={handleLocationCreated}
-        location={selectedLocation}
-        warehouseId={currentWarehouse?._id}
+      <AssignPalletModal
+        key={selectedPallet?._id || "new"}
+        isOpen={isAssignModalOpen}
+        onClose={closeAssignModal}
+        barcode={selectedBarcode}
+        pallet={selectedPallet}
+        onAssign={handlePalletAssigned}
+        locations={locations}
       />
     </div>
   );

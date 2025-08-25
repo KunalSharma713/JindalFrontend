@@ -34,19 +34,27 @@ const DataTable = ({
 
   const debounceRef = useRef(null);
 
-  // Sync external filters
+  // Sync external filters - use deep comparison
   useEffect(() => {
-    setLocalFilters(filters);
-  }, [filters]);
+    const filtersChanged = JSON.stringify(filters) !== JSON.stringify(localFilters);
+    if (filtersChanged) {
+      setLocalFilters(filters);
+    }
+  }, [filters, localFilters]);
 
-  // Initialize column widths
-  useEffect(() => {
-    const initialWidths = {};
+  // Memoize column widths initialization
+  const initialColumnWidths = useMemo(() => {
+    const widths = {};
     columns.forEach((col) => {
-      initialWidths[col.key] = col.width || 150;
+      widths[col.key] = col.width || 150;
     });
-    setColumnWidths(initialWidths);
+    return widths;
   }, [columns]);
+
+  // Initialize column widths only once
+  useEffect(() => {
+    setColumnWidths(initialColumnWidths);
+  }, [initialColumnWidths]);
 
   // Sorting
   const handleSort = useCallback(
@@ -62,20 +70,23 @@ const DataTable = ({
     [onSort, sortConfig]
   );
 
-  // Filtering
+  // Filtering with memoized callback
   const handleFilterChange = useCallback(
     (key, value) => {
-      const newFilters = { ...localFilters, [key]: value };
-      setLocalFilters(newFilters);
-
-      if (onFilter) {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-          onFilter(newFilters); // trigger API fetch
-        }, 300);
-      }
+      setLocalFilters(prevFilters => {
+        const newFilters = { ...prevFilters, [key]: value };
+        
+        if (onFilter) {
+          if (debounceRef.current) clearTimeout(debounceRef.current);
+          debounceRef.current = setTimeout(() => {
+            onFilter(newFilters); // trigger API fetch
+          }, 300);
+        }
+        
+        return newFilters;
+      });
     },
-    [localFilters, onFilter]
+    [onFilter]
   );
 
   // Inline editing
@@ -325,7 +336,7 @@ const DataTable = ({
       {/* Filter Toggle */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <button
+          {/* <button
             className="px-3 py-1 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -335,7 +346,7 @@ const DataTable = ({
             <span className="px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
               {activeFilterCount} active
             </span>
-          )}
+          )} */}
         </div>
         <div className="text-sm text-neutral-500">
           Showing {startItem} to {endItem} of{" "}
@@ -344,6 +355,7 @@ const DataTable = ({
       </div>
 
       {/* Filters */}
+      
       {showFilters && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded border border-neutral-200">
           {columns

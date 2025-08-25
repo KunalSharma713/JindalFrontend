@@ -41,7 +41,7 @@ export const useApi = () => {
           headers,
         };
 
-        if (method === 'GET' && body) {
+        if (method === "GET" && body) {
           const params = new URLSearchParams(body);
           url += `?${params.toString()}`;
         } else if (body) {
