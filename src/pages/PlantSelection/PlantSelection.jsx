@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../../hooks/useApi';
 import { toast } from 'react-hot-toast';
 import { Warehouse, CheckCircle } from 'lucide-react';
+import { setSelectedPlant } from '../../store/slices/plantSlice';
+import { useDispatch } from 'react-redux';
 
 const PlantSelection = () => {
   const [plants, setPlants] = useState([]);
@@ -11,6 +13,7 @@ const PlantSelection = () => {
   const location = useLocation();
   const { apiRequest } = useApi();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchPlants = async () => {
@@ -39,14 +42,55 @@ const PlantSelection = () => {
     fetchPlants();
   }, [apiRequest]);
 
-  const handlePlantSelect = (plant) => {
-    setSelectedPlant(plant._id);
-    localStorage.setItem('selectedPlantId', plant._id);
-    localStorage.setItem('selectedPlantName', plant.warehouse_name);
-    
-    // Get the original destination from the location state or default to dashboard
-    const from = location.state?.from?.pathname || '/dashboard';
-    navigate(from, { replace: true });
+  const handlePlantSelect = async (plant) => {
+    if (!plant || !plant._id) {
+      console.error('Invalid plant data provided');
+      toast.error('Invalid plant data');
+      return;
+    }
+
+    try {
+      // Update local state for UI
+      setSelectedPlant(plant._id);
+      
+      // Prepare plant data
+      const plantData = {
+        _id: plant._id,
+        name: plant.name || '',
+        warehouse_name: plant.warehouse_name || '',
+        code: plant.code || ''
+      };
+      
+      // Create a plain action object
+      const action = {
+        type: 'plant/setSelectedPlant',
+        payload: plantData
+      };
+      
+      // Dispatch the plain action object
+      dispatch(action);
+      
+      // Save to localStorage
+      localStorage.setItem('selectedPlant', JSON.stringify(plantData));
+      localStorage.setItem('selectedPlantId', plantData._id);
+      localStorage.setItem('selectedPlantName', plantData.warehouse_name || plantData.name || '');
+      
+      // Dispatch storage event to notify other components
+      window.dispatchEvent(new Event('storage'));
+      
+      // Small delay to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Navigate to the original destination or dashboard
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+      
+      // Force a page reload to ensure all components pick up the new plant
+      window.location.reload();
+    } catch (error) {
+      console.error('Error selecting plant:', error);
+      toast.error('Failed to select plant');
+    }
   };
 
   if (loading) {

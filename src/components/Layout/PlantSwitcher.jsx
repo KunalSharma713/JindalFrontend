@@ -77,7 +77,7 @@ const PlantSwitcher = () => {
     }
 
     try {
-      // Validate plant data before saving
+      // Prepare plant data
       const plantData = {
         _id: plant._id,
         name: plant.name || '',
@@ -85,30 +85,34 @@ const PlantSwitcher = () => {
         code: plant.code || ''
       };
 
-      dispatch(setSelectedPlant(plantData));
+      // Create a plain action object
+      const action = {
+        type: 'plant/setSelectedPlant',
+        payload: plantData
+      };
       
-      try {
-        localStorage.setItem('selectedPlant', JSON.stringify(plantData));
-        localStorage.setItem('selectedPlantId', plantData._id);
-        localStorage.setItem('selectedPlantName', plantData.warehouse_name || plantData.name || '');
-      } catch (storageError) {
-        console.error('Error saving to localStorage:', storageError);
-        toast.error('Failed to save plant selection');
-        return;
-      }
+      // Dispatch the plain action object
+      dispatch(action);
+      
+      // Save to localStorage
+      localStorage.setItem('selectedPlant', JSON.stringify(plantData));
+      localStorage.setItem('selectedPlantId', plantData._id);
+      localStorage.setItem('selectedPlantName', plantData.warehouse_name || plantData.name || '');
       
       // Dispatch storage event to notify other components
       window.dispatchEvent(new Event('storage'));
       
+      // Close the dropdown
       setIsOpen(false);
       
       if (shouldReload) {
         const toastId = toast.loading('Switching plant...');
-        // Small delay to show the loading state
+        // Small delay to ensure state is updated before reload
         setTimeout(() => {
           toast.dismiss(toastId);
+          // Force a full page reload to ensure all components pick up the new plant
           window.location.reload();
-        }, 500);
+        }, 100);
       }
     } catch (error) {
       console.error('Error selecting plant:', error);
