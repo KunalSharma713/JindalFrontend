@@ -60,9 +60,16 @@ const UserModal = ({ isOpen, onClose }) => {
 
   const onSubmit = async (data) => {
     try {
+      // Get the selected plant ID from localStorage
+      const selectedPlantId = localStorage.getItem('selectedPlantId');
+      if (!selectedPlantId) {
+        throw new Error('No plant selected');
+      }
+
       const payload = { 
         ...data, 
-        roleid: "68a3028131afd421fe6313ca", 
+        roleid: "68a3028131afd421fe6313ca",
+        warehouse: selectedPlantId, 
       };
       
       if (isEditing && !payload.password) {
@@ -71,7 +78,7 @@ const UserModal = ({ isOpen, onClose }) => {
 
       if (isEditing) {
         // For editing, use the _id from selectedUser
-        const response = await apiRequest(`user/${selectedUser._id}`, "PUT", payload, true);
+        const response = await apiRequest(`user/${selectedUser._id}`, "PUT", true);
         const transformedUser = {
           ...response,
           name: `${response.first_name} ${response.last_name}`,
@@ -80,7 +87,6 @@ const UserModal = ({ isOpen, onClose }) => {
         dispatch(updateUser({ ...selectedUser, ...transformedUser }));
         toast.success('User updated successfully!');
       } else {
-        // For adding new user
         const response = await apiRequest("user/", "POST", payload, true);
         const transformedUser = {
           ...response,
@@ -91,7 +97,7 @@ const UserModal = ({ isOpen, onClose }) => {
         dispatch(addUser(transformedUser));
         toast.success('User added successfully!');
       }
-      
+
       handleClose()
     } catch (error) {
       console.error('Error saving user:', error)

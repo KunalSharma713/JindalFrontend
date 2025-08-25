@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import PlantTable from "../../components/PlantManagement/PlantTable";
 import PlantModal from "../../components/PlantManagement/PlantModal";
+import DataTable from "../../components/DataTable";
 import { useApi } from "../../hooks/useApi";
 
 const PlantManagement = () => {
@@ -30,12 +30,15 @@ const PlantManagement = () => {
       const { page, limit } = pagination;
       const { key, direction } = sortConfig;
 
-      // Build query params
+      // Build query params with correct field names
       const params = new URLSearchParams({
         page,
         limit,
         ...(key && { sortBy: key, sortOrder: direction }),
-        ...(filters.warehouse_name && { name: filters.warehouse_name }),
+        ...(filters.warehouse_name && {
+          warehouse_name: filters.warehouse_name,
+        }),
+        ...(filters.code && { code: filters.code }),
       });
 
       const response = await apiRequest(`warehouse?${params}`, "GET");
@@ -66,7 +69,16 @@ const PlantManagement = () => {
   };
 
   const handleEditWarehouse = (warehouse) => {
-    setSelectedWarehouse(warehouse);
+    console.log("wwwwwwwwww", warehouse);
+    // Create a copy of the warehouse object to avoid direct state mutation
+    setSelectedWarehouse({
+      ...warehouse,
+      // Ensure all required fields have proper defaults if they're null/undefined
+      warehouse_name: warehouse.warehouse_name || "",
+      code: warehouse.code || "",
+      lat: warehouse.lat || null,
+      long: warehouse.long || null,
+    });
     setIsModalOpen(true);
   };
 
@@ -75,7 +87,9 @@ const PlantManagement = () => {
       try {
         await apiRequest(`warehouse/${warehouseId}`, "DELETE");
         toast.success("Plant deleted successfully");
-        fetchWarehouses(); // Refresh the list
+        // Refresh the list and reset to first page
+        setPagination((prev) => ({ ...prev, page: 1 }));
+        fetchWarehouses();
       } catch (error) {
         console.error("Error deleting plant:", error);
         toast.error(error.response?.data?.message || "Failed to delete plant");
@@ -92,8 +106,77 @@ const PlantManagement = () => {
   };
 
   const handleFilter = (newFilters) => {
-    setFilters(newFilters);
+    // Map filter names to match the backend field names
+    const mappedFilters = {};
+    if (newFilters.name) {
+      mappedFilters.warehouse_name = newFilters.name;
+    }
+    if (newFilters.code) {
+      mappedFilters.code = newFilters.code;
+    }
+    setFilters(mappedFilters);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
+  };
+
+  const columns = [
+    {
+      key: "warehouse_name",
+      title: "Plant Name",
+      sortable: true,
+    },
+    {
+      key: "code",
+      title: "Code",
+      sortable: true,
+    },
+    {
+      key: "lat",
+      title: "Latitude",
+    },
+    {
+      key: "long",
+      title: "Longitude",
+    },
+    {
+      key: "actions",
+      title: "Actions",
+      render: (_, row) => {
+        if (!row) return null;
+
+        return (
+          <div className="flex space-x-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditWarehouse(row);
+              }}
+              className="text-blue-600 hover:text-blue-900"
+              title="Edit warehouse"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteWarehouse(row._id);
+              }}
+              className="text-red-600 hover:text-red-900"
+              title="Delete warehouse"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const handleModalClose = (shouldRefresh = false) => {
+    setIsModalOpen(false);
+    setSelectedWarehouse(null);
+    if (shouldRefresh) {
+      fetchWarehouses();
+    }
   };
 
   return (
@@ -122,26 +205,32 @@ const PlantManagement = () => {
 
       {/* Plant Table */}
       <div className="bg-white rounded-lg shadow">
-        <PlantTable
-          warehouses={warehouses}
+        <DataTable
+          data={warehouses}
+          columns={columns}
           loading={loading}
-          onEditWarehouse={handleEditWarehouse}
-          onDeleteWarehouse={handleDeleteWarehouse}
-          page={pagination.page}
+          totalItems={pagination.total}
+          currentPage={pagination.page}
+          itemsPerPage={pagination.limit}
           totalPages={pagination.totalPages}
           onPageChange={handlePageChange}
-          sortConfig={sortConfig}
           onSort={handleSort}
+          onFilter={handleFilter}
+          sortConfig={sortConfig}
+          filters={filters}
+          emptyMessage="No Plants found"
         />
       </div>
 
       {/* Plant Modal */}
       <PlantModal
         isOpen={isModalOpen}
-        onClose={() => {
+        onClose={(shouldRefresh) => {
           setIsModalOpen(false);
           setSelectedWarehouse(null);
-          fetchWarehouses(); // Refresh data after modal closes
+          if (shouldRefresh) {
+            fetchWarehouses(); // Refresh data after successful operation
+          }
         }}
         warehouse={selectedWarehouse}
       />

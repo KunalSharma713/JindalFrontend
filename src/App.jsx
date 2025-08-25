@@ -12,6 +12,9 @@ import PermissionsManagement from './pages/PermissionsManagement/PermissionsMana
 import Profile from './pages/Profile/Profile';
 import Login from './pages/Auth/Login';
 import TestAuth from './pages/Auth/TestAuth';
+import PlantSelection from './pages/PlantSelection/PlantSelection';
+import LocationManagement from './pages/LocationManagement/LocationManagement';
+import PalletManagement from './pages/PalletManagement/PalletManagement';
 
 const ProtectedRoute = () => {
   const dispatch = useDispatch();
@@ -64,25 +67,116 @@ function App() {
     }
   }, [dispatch]);
 
+  // Check if user has selected a plant
+  const hasSelectedPlant = localStorage.getItem('selectedPlantId');
+  const location = useLocation();
+
+  // Redirect to login if not authenticated, or to plant selection if no plant selected
+  const getProtectedRouteElement = (element) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    }
+    
+    if (!hasSelectedPlant) {
+      return <Navigate to="/select-plant" state={{ from: location.pathname }} replace />;
+    }
+    
+    return element;
+  };
+
   return (
     <Routes>
       <Route path="/test-auth" element={<TestAuth />} />
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} />
+      <Route 
+        path="/login" 
+        element={
+          !isAuthenticated ? (
+            <Login />
+          ) : (
+            <Navigate to={
+              hasSelectedPlant 
+                ? location.state?.from?.pathname || "/dashboard" 
+                : "/select-plant"
+            } replace />
+          )
+        } 
+      />
       
-      {/* Protected Routes */}
+      {/* Plant Selection Route - Only accessible when authenticated but no plant selected */}
+      <Route 
+        path="/select-plant" 
+        element={
+          isAuthenticated ? (
+            hasSelectedPlant ? (
+              <Navigate to={location.state?.from?.pathname || "/dashboard"} replace />
+            ) : (
+              <PlantSelection />
+            )
+          ) : (
+            <Navigate to="/login" state={{ from: '/select-plant' }} replace />
+          )
+        } 
+      />
+      
+      {/* Protected Routes - Only accessible with a selected plant */}
       <Route element={<ProtectedRoute />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/users" element={<UserManagement />} />
-        <Route path="/plants" element={<PlantManagement />} />
-        <Route path="/projects" element={<ProjectListing />} />
-        <Route path="/projects/:id" element={<ProjectDetails />} />
-        <Route path="/permissions" element={<PermissionsManagement />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route index element={getProtectedRouteElement(
+            <Navigate to="/dashboard" replace />
+          )} 
+        />
+        <Route 
+          path="/dashboard" 
+          element={getProtectedRouteElement(<Dashboard />)} 
+        />
+        <Route 
+          path="/users" 
+          element={getProtectedRouteElement(<UserManagement />)} 
+        />
+        <Route 
+          path="/plants" 
+          element={getProtectedRouteElement(<PlantManagement />)} 
+        />
+        <Route 
+          path="/locations" 
+          element={getProtectedRouteElement(<LocationManagement />)} 
+        />
+        <Route 
+          path="/pallets" 
+          element={getProtectedRouteElement(<PalletManagement />)} 
+        />
+        <Route 
+          path="/projects" 
+          element={getProtectedRouteElement(<ProjectListing />)} 
+        />
+        <Route 
+          path="/projects/:id" 
+          element={getProtectedRouteElement(<ProjectDetails />)} 
+        />
+        <Route 
+          path="/permissions" 
+          element={getProtectedRouteElement(<PermissionsManagement />)} 
+        />
+        <Route 
+          path="/profile" 
+          element={getProtectedRouteElement(<Profile />)} 
+        />
       </Route>
       
       {/* Catch all other routes */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+      <Route 
+        path="*" 
+        element={
+          isAuthenticated ? (
+            hasSelectedPlant ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/select-plant" replace />
+            )
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } 
+      />
     </Routes>
   );
 }

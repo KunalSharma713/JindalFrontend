@@ -62,6 +62,10 @@ const Login = () => {
         }
         localStorage.setItem('user', JSON.stringify(user));
         
+        // Clear any previously selected plant
+        localStorage.removeItem('selectedPlantId');
+        localStorage.removeItem('selectedPlantName');
+        
         // Dispatch login success
         dispatch(loginSuccess({ 
           token: accessToken, 
@@ -69,7 +73,12 @@ const Login = () => {
         }));
         
         toast.success('Login successful!');
-        navigate(from, { replace: true });
+        
+        // Always redirect to plant selection after login
+        navigate('/select-plant', { 
+          state: { from: from },
+          replace: true 
+        });
       }
     } catch (err) {
       toast.error(err.message || 'An error occurred during login.');

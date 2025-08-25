@@ -33,33 +33,57 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
   });
 
   useEffect(() => {
-    if (warehouse) {
+    if (warehouse && Object.keys(warehouse).length > 0) {
+      console.log('Initializing form with warehouse data:', warehouse);
       reset({
         warehouse_name: warehouse.warehouse_name || "",
-        lat: warehouse.lat || null,
-        long: warehouse.long || null,
         code: warehouse.code || "",
+        lat: warehouse.lat !== undefined ? warehouse.lat : "",
+        long: warehouse.long !== undefined ? warehouse.long : "",
       });
     } else {
+      console.log('Initializing empty form');
       reset({
         warehouse_name: "",
-        lat: null,
-        long: null,
         code: "",
+        lat: "",
+        long: "",
       });
     }
   }, [warehouse, reset]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     try {
       if (isEditing) {
-        await apiRequest(`warehouse/${warehouse._id}`, "PUT", data);
+        // For update, include the _id in the URL and send all fields
+        const response = await apiRequest(
+          `warehouse/${warehouse._id}`, 
+          "PUT", 
+          {
+            warehouse_name: formData.warehouse_name,
+            code: formData.code,
+            lat: formData.lat || null,
+            long: formData.long || null
+          },
+          true
+        );
         toast.success("Plant updated successfully!");
       } else {
-        await apiRequest("warehouse", "POST", data);
+        // For create
+        const response = await apiRequest(
+          "warehouse", 
+          "POST", 
+          {
+            warehouse_name: formData.warehouse_name,
+            code: formData.code,
+            lat: formData.lat || null,
+            long: formData.long || null
+          },
+          true
+        );
         toast.success("Plant created successfully!");
       }
-      onClose();
+      onClose(true); // Pass true to indicate successful operation
     } catch (error) {
       console.error("Error saving plant:", error);
       toast.error(error.response?.data?.message || "Failed to save plant");
@@ -68,7 +92,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
 
   const handleClose = () => {
     reset();
-    onClose();
+    onClose(false); // Pass false to indicate no refresh needed (cancel action)
   };
 
   if (!isOpen) return null;
@@ -89,7 +113,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">
-                {isEditing ? "Edit Plant" : "Add New Plant"}
+                {isEditing ? "Update Plant" : "Add New Plant"}
               </h3>
               <button
                 onClick={handleClose}
@@ -145,7 +169,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
                   </label>
                   <input
                     type="number"
-                    step="any"
+                    step="0.000001"
                     {...register("lat")}
                     className={`w-full px-3 py-2 border ${
                       errors.lat ? "border-red-300" : "border-gray-300"
@@ -164,7 +188,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
                   </label>
                   <input
                     type="number"
-                    step="any"
+                    step="0.000001"
                     {...register("long")}
                     className={`w-full px-3 py-2 border ${
                       errors.long ? "border-red-300" : "border-gray-300"

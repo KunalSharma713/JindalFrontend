@@ -29,12 +29,19 @@ const UserManagement = () => {
       const { page, limit } = pagination;
       const { key, direction } = sortConfig;
 
+      // Get the selected plant ID from localStorage
+      const selectedPlantId = localStorage.getItem('selectedPlantId');
+      if (!selectedPlantId) {
+        throw new Error('No plant selected');
+      }
+
       // Build query params
       const params = new URLSearchParams({
         page,
         limit,
         ...(key && { sortBy: key, sortOrder: direction }),
         ...filters,
+        warehouse: selectedPlantId, 
       });
 
       const response = await apiRequest(`user/?${params}`, "GET");
@@ -127,19 +134,6 @@ const UserManagement = () => {
       sortable: true,
       filterable: true,
     },
-    // {
-    //   key: 'status',
-    //   title: 'Status',
-    //   sortable: true,
-    //   filterable: true,
-    //   render: (value) => (
-    //     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-    //       value === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-    //     }`}>
-    //       {value}
-    //     </span>
-    //   ),
-    // },
     {
       key: "actions",
       title: "Actions",

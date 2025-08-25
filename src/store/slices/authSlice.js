@@ -3,9 +3,21 @@ import { createSlice } from '@reduxjs/toolkit'
 // Check for existing auth state on initial load
 const token = localStorage.getItem('accessToken');
 const userData = localStorage.getItem('user');
+let parsedUser = null;
+
+try {
+  if (userData) {
+    parsedUser = JSON.parse(userData);
+  }
+} catch (error) {
+  console.error('Error parsing user data from localStorage:', error);
+  // Clear invalid data
+  localStorage.removeItem('user');
+  localStorage.removeItem('accessToken');
+}
 
 const initialState = {
-  user: userData ? JSON.parse(userData) : null,
+  user: parsedUser,
   isAuthenticated: !!token,
   loading: false,
   error: null
@@ -45,6 +57,8 @@ const authSlice = createSlice({
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
+        localStorage.removeItem('selectedPlantId');
+        localStorage.removeItem('selectedPlantName');
       }
       
       // Reset state

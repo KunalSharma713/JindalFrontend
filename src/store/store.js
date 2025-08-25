@@ -4,6 +4,7 @@ import usersSlice from './slices/usersSlice'
 import projectsSlice from './slices/projectsSlice'
 import analyticsSlice from './slices/analyticsSlice'
 import permissionsSlice from './slices/permissionsSlice'
+import plantReducer from './slices/plantSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     projects: projectsSlice,
     analytics: analyticsSlice,
     permissions: permissionsSlice,
+    plant: plantReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

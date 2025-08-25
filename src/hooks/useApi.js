@@ -1,9 +1,9 @@
 import { useState, useCallback } from "react";
 
 //Prod
-const BASE_URL = "https://bhoomiapps.thevivapower.com/api/";
+// const BASE_URL = "https://bhoomiapps.thevivapower.com/api/";
 
-// const BASE_URL = "http://localhost:5000/api/";
+const BASE_URL = "http://localhost:5000/api/";
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
@@ -34,12 +34,21 @@ export const useApi = () => {
           }
         }
 
-        const response = await fetch(`${BASE_URL}${endpoint}`, {
+        // Handle query parameters for GET requests
+        let url = `${BASE_URL}${endpoint}`;
+        const config = {
           method,
           headers,
-          body: body ? JSON.stringify(body) : null,
-        });
+        };
 
+        if (method === 'GET' && body) {
+          const params = new URLSearchParams(body);
+          url += `?${params.toString()}`;
+        } else if (body) {
+          config.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(url, config);
         const data = await response.json();
 
         if (!response.ok) {

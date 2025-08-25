@@ -28,25 +28,25 @@ const Dashboard = () => {
       <StatsCards metrics={metrics} />
 
       {/* Charts grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UserGrowthChart data={chartData.userGrowth} />
         <ProjectStatusChart data={chartData.projectStatus} />
-      </div>
+      </div> */}
 
       {/* Revenue chart - full width */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* <div className="grid grid-cols-1 gap-6">
         <RevenueChart data={chartData.revenueData} />
-      </div>
+      </div> */}
 
       {/* Bottom section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <RecentActivity activities={activityLogs} />
         </div>
         <div>
           <QuickActions />
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }
