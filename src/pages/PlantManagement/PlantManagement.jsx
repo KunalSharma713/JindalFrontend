@@ -155,7 +155,7 @@ const PlantManagement = () => {
             >
               <Edit3 className="h-4 w-4" />
             </button>
-            <button
+            {/* <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleDeleteWarehouse(row._id);
@@ -164,7 +164,7 @@ const PlantManagement = () => {
               title="Delete warehouse"
             >
               <Trash2 className="h-4 w-4" />
-            </button>
+            </button> */}
           </div>
         );
       },
