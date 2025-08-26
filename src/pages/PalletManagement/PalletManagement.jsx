@@ -283,21 +283,30 @@ const PalletManagement = () => {
   };
 
 
-  const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, page }));
+  const handlePageChange = (newPage, newLimit) => {
+    if (newLimit && newLimit !== pagination.limit) {
+      // Handle limit change
+      setPagination(prev => ({
+        ...prev,
+        page: 1, // Reset to first page when changing limit
+        limit: newLimit
+      }));
+    } else if (newPage !== pagination.page) {
+      // Handle page change
+      setPagination(prev => ({
+        ...prev,
+        page: newPage
+      }));
+    }
   };
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
   };
 
   const handleSort = ({ key, direction }) => {
     setSortConfig({ key, direction });
-  };
-
-  const handleLimitChange = (limit) => {
-    setPagination((prev) => ({ ...prev, limit, page: 1 }));
   };
 
   const columns = [
@@ -476,9 +485,11 @@ const PalletManagement = () => {
             columns={columns}
             data={barcodesAndPallets}
             loading={loading}
-            pagination={pagination}
+            currentPage={pagination.page}
+            itemsPerPage={pagination.limit}
+            totalItems={pagination.total}
+            totalPages={pagination.totalPages}
             onPageChange={handlePageChange}
-            onLimitChange={handleLimitChange}
             onSort={handleSort}
             sortConfig={sortConfig}
             onFilter={handleFilter}

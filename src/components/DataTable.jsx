@@ -36,7 +36,8 @@ const DataTable = ({
 
   // Sync external filters - use deep comparison
   useEffect(() => {
-    const filtersChanged = JSON.stringify(filters) !== JSON.stringify(localFilters);
+    const filtersChanged =
+      JSON.stringify(filters) !== JSON.stringify(localFilters);
     if (filtersChanged) {
       setLocalFilters(filters);
     }
@@ -73,16 +74,16 @@ const DataTable = ({
   // Filtering with memoized callback
   const handleFilterChange = useCallback(
     (key, value) => {
-      setLocalFilters(prevFilters => {
+      setLocalFilters((prevFilters) => {
         const newFilters = { ...prevFilters, [key]: value };
-        
+
         if (onFilter) {
           if (debounceRef.current) clearTimeout(debounceRef.current);
           debounceRef.current = setTimeout(() => {
             onFilter(newFilters); // trigger API fetch
           }, 300);
         }
-        
+
         return newFilters;
       });
     },
@@ -194,9 +195,9 @@ const DataTable = ({
         onClick={() => onPageChange(page)}
         className={`px-3 py-1 border rounded-md mx-1 text-sm ${
           active
-            ? "bg-primary text-white border-primary-600"
+            ? "bg-blue-600 text-white border-blue-700"
             : "bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-300"
-        }`}
+        } hover:bg-opacity-90 transition-colors`}
       >
         {page}
       </button>
@@ -207,9 +208,9 @@ const DataTable = ({
         key="prev"
         disabled={currentPage === 1}
         onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-        className="px-2 py-1 mx-1 text-sm border rounded-md bg-white hover:bg-neutral-25 text-neutral-700 border-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-1 mx-1 text-sm border rounded-md bg-white hover:bg-gray-100 text-gray-700 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        Prev
+        Previous
       </button>
     );
 
@@ -244,7 +245,7 @@ const DataTable = ({
         onClick={() =>
           currentPage < totalPages && onPageChange(currentPage + 1)
         }
-        className="px-2 py-1 mx-1 text-sm border rounded-md bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-1 mx-1 text-sm border rounded-md bg-white hover:bg-gray-100 text-gray-700 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         Next
       </button>
@@ -355,7 +356,7 @@ const DataTable = ({
       </div>
 
       {/* Filters */}
-      
+
       {showFilters && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded border border-neutral-200">
           {columns
@@ -501,6 +502,7 @@ const DataTable = ({
             <span className="text-neutral-600">Rows per page:</span>
             <select
               value={itemsPerPage}
+              disabled={true}
               onChange={(e) => onPageChange(1, Number(e.target.value))}
               className="border border-neutral-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-300 bg-white"
             >
