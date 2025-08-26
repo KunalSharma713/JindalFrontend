@@ -1,14 +1,16 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import StatsCards from '../../components/Dashboard/StatsCards'
-import UserGrowthChart from '../../components/Dashboard/UserGrowthChart'
-import ProjectStatusChart from '../../components/Dashboard/ProjectStatusChart'
-import RevenueChart from '../../components/Dashboard/RevenueChart'
-import RecentActivity from '../../components/Dashboard/RecentActivity'
-import QuickActions from '../../components/Dashboard/QuickActions'
+import React from "react";
+import { useSelector } from "react-redux";
+import StatsCards from "../../components/Dashboard/StatsCards";
+import UserGrowthChart from "../../components/Dashboard/UserGrowthChart";
+import ProjectStatusChart from "../../components/Dashboard/ProjectStatusChart";
+import RevenueChart from "../../components/Dashboard/RevenueChart";
+import RecentActivity from "../../components/Dashboard/RecentActivity";
+import QuickActions from "../../components/Dashboard/QuickActions";
 
 const Dashboard = () => {
-  const { metrics, chartData, activityLogs } = useSelector((state) => state.analytics)
+  const { metrics, chartData, activityLogs } = useSelector(
+    (state) => state.analytics
+  );
 
   return (
     <div className="space-y-6">
@@ -25,7 +27,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats cards */}
-      <StatsCards metrics={metrics} />
+      {/* <StatsCards metrics={metrics} /> */}
 
       {/* Charts grid */}
       {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -48,7 +50,7 @@ const Dashboard = () => {
         </div>
       </div> */}
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
