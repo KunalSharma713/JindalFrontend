@@ -162,23 +162,23 @@ const LocationManagement = () => {
   const handlePageChange = (newPage, newLimit) => {
     if (newLimit && newLimit !== pagination.limit) {
       // Handle limit change
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         page: 1, // Reset to first page when changing limit
-        limit: newLimit
+        limit: newLimit,
       }));
     } else if (newPage !== pagination.page) {
       // Handle page change
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
-        page: newPage
+        page: newPage,
       }));
     }
   };
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
   };
 
   const handleSort = ({ key, direction }) => {
@@ -190,19 +190,25 @@ const LocationManagement = () => {
       key: "location_name",
       title: "Location Name",
       sortable: true,
+      filterable: true,
     },
     {
       key: "barcode_key",
       title: "Barcode",
       sortable: true,
+      filterable: true,
     },
     {
       key: "lat",
       title: "Latitude",
+      sortable: true,
+      filterable: false,
     },
     {
       key: "long",
       title: "Longitude",
+      sortable: true,
+      filterable: false,
     },
     {
       key: "actions",

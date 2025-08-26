@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import PlantModal from "../../components/PlantManagement/PlantModal";
@@ -23,6 +23,8 @@ const PlantManagement = () => {
     direction: "asc",
   });
   const [filters, setFilters] = useState({});
+  const filtersRef = useRef({});
+  const isInitialMount = useRef(true);
 
   const fetchWarehouses = useCallback(async () => {
     try {
@@ -34,11 +36,14 @@ const PlantManagement = () => {
       const params = new URLSearchParams({
         page,
         limit,
-        ...(key && { sortBy: key, sortOrder: direction }),
-        ...(filters.warehouse_name && {
-          warehouse_name: filters.warehouse_name,
-        }),
-        ...(filters.code && { code: filters.code }),
+        ...(key && { sortBy: key, sortOrder: direction })
+      });
+
+      // Add filters to the query params
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value.trim() !== '') {
+          params.append(key, value);
+        }
       });
 
       const response = await apiRequest(`warehouse?${params}`, "GET");
@@ -69,7 +74,6 @@ const PlantManagement = () => {
   };
 
   const handleEditWarehouse = (warehouse) => {
-    console.log("wwwwwwwwww", warehouse);
     // Create a copy of the warehouse object to avoid direct state mutation
     setSelectedWarehouse({
       ...warehouse,
@@ -105,37 +109,56 @@ const PlantManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleFilter = (newFilters) => {
-    // Map filter names to match the backend field names
-    const mappedFilters = {};
-    if (newFilters.name) {
-      mappedFilters.warehouse_name = newFilters.name;
+  const handleFilter = useCallback((newFilters) => {
+    // Clean up empty filters
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(newFilters)
+        .filter(([_, value]) => value !== undefined && value !== null && value.toString().trim() !== '')
+    );
+    
+    // Only update if filters actually changed
+    const filtersChanged = Object.keys({ ...cleanedFilters, ...filtersRef.current }).some(
+      key => cleanedFilters[key] !== filtersRef.current[key]
+    );
+    
+    if (filtersChanged) {
+      // Skip the first render to prevent double API call
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        filtersRef.current = cleanedFilters;
+        return;
+      }
+      
+      setFilters(cleanedFilters);
+      filtersRef.current = cleanedFilters;
+      setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
     }
-    if (newFilters.code) {
-      mappedFilters.code = newFilters.code;
-    }
-    setFilters(mappedFilters);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
-  };
+  }, []);
 
   const columns = [
     {
       key: "warehouse_name",
       title: "Plant Name",
       sortable: true,
+      filterable: true,
     },
     {
       key: "code",
       title: "Code",
       sortable: true,
+      filterable: true,
     },
     {
       key: "lat",
       title: "Latitude",
+      sortable: true,
+      filterable: false,
     },
     {
       key: "long",
       title: "Longitude",
+      sortable: true,
+      filterable: false,
     },
     {
       key: "actions",

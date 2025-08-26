@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 className="w-full flex items-center justify-between p-2 rounded-md hover:bg-gray-50"
               >
                 <div className="flex items-center">
-                  <img
+                  {/* <img
                     className="h-8 w-8 rounded-full"
                     src={
                       user?.avatar ||
@@ -100,7 +100,10 @@ const Sidebar = ({ isOpen, onClose }) => {
                         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
                         .join(" ") || "User"
                     }
-                  />
+                  /> */}
+                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <User className="h-4 w-4 text-gray-500" />
+                  </div>
                   <div className="ml-3 text-left">
                     <p className="text-sm font-medium text-gray-700">
                       {user?.username

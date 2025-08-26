@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -22,6 +22,8 @@ const UserManagement = () => {
   });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [filters, setFilters] = useState({});
+  const filtersRef = useRef({});
+  const isInitialMount = useRef(true);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -40,8 +42,14 @@ const UserManagement = () => {
         page,
         limit,
         ...(key && { sortBy: key, sortOrder: direction }),
-        ...filters,
         warehouse: selectedPlantId, 
+      });
+
+      // Add filters to the query params
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value.trim() !== '') {
+          params.append(key, value);
+        }
       });
 
       const response = await apiRequest(`user/?${params}`, "GET");
@@ -50,7 +58,7 @@ const UserManagement = () => {
         // Transform data to match DataTable expected format
         const transformedUsers = response.data.map((user) => ({
           ...user,
-          name: `${user.first_name} ${user.last_name}`,
+          // name: `${user.first_name} ${user.last_name}`,
           role: user.roleid?.name || "N/A",
         }));
 
@@ -104,14 +112,35 @@ const UserManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleFilter = (newFilters) => {
-    setFilters(newFilters);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
-  };
+  const handleFilter = useCallback((newFilters) => {
+    // Clean up empty filters
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(newFilters)
+        .filter(([_, value]) => value !== undefined && value !== null && value.toString().trim() !== '')
+    );
+    
+    // Only update if filters actually changed
+    const filtersChanged = Object.keys({ ...cleanedFilters, ...filtersRef.current }).some(
+      key => cleanedFilters[key] !== filtersRef.current[key]
+    );
+    
+    if (filtersChanged) {
+      // Skip the first render to prevent double API call
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        filtersRef.current = cleanedFilters;
+        return;
+      }
+      
+      setFilters(cleanedFilters);
+      filtersRef.current = cleanedFilters;
+      setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+    }
+  }, []);
 
   const columns = [
     {
-      key: "name",
+      key: "username",
       title: "Name",
       sortable: true,
       filterable: true,
@@ -132,7 +161,7 @@ const UserManagement = () => {
       key: "role",
       title: "Role",
       sortable: true,
-      filterable: true,
+      filterable: false,
     },
     {
       key: "actions",

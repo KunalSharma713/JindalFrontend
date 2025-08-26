@@ -28,20 +28,40 @@ const DataTable = ({
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [columnWidths, setColumnWidths] = useState({});
-  const [localFilters, setLocalFilters] = useState(filters);
+  const [localFilters, setLocalFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [resizing, setResizing] = useState(null);
 
   const debounceRef = useRef(null);
+  const isInitialMount = useRef(true);
 
-  // Sync external filters - use deep comparison
+  // Sync filters from props to local state
   useEffect(() => {
-    const filtersChanged =
-      JSON.stringify(filters) !== JSON.stringify(localFilters);
-    if (filtersChanged) {
-      setLocalFilters(filters);
+    if (isInitialMount.current) {
+      // Initialize localFilters on first render
+      setLocalFilters(prev => ({
+        ...prev,
+        ...Object.fromEntries(
+          Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+        )
+      }));
+      isInitialMount.current = false;
+    } else {
+      // Only update if filters have actually changed (prevent unnecessary re-renders)
+      const filtersChanged = Object.keys({ ...filters, ...localFilters }).some(
+        key => filters[key] !== localFilters[key]
+      );
+      
+      if (filtersChanged) {
+        setLocalFilters(prev => ({
+          ...prev,
+          ...Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+          )
+        }));
+      }
     }
-  }, [filters, localFilters]);
+  }, [filters]);
 
   // Memoize column widths initialization
   const initialColumnWidths = useMemo(() => {
@@ -74,20 +94,24 @@ const DataTable = ({
   // Filtering with memoized callback
   const handleFilterChange = useCallback(
     (key, value) => {
-      setLocalFilters((prevFilters) => {
-        const newFilters = { ...prevFilters, [key]: value };
-
-        if (onFilter) {
-          if (debounceRef.current) clearTimeout(debounceRef.current);
-          debounceRef.current = setTimeout(() => {
-            onFilter(newFilters); // trigger API fetch
-          }, 300);
-        }
-
-        return newFilters;
-      });
+      // Update local state immediately for responsive UI
+      const newFilters = { ...localFilters, [key]: value };
+      setLocalFilters(newFilters);
+      
+      // Debounce the API call
+      if (onFilter) {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+          // Only include non-empty values in the filter
+          const cleanedFilters = Object.fromEntries(
+            Object.entries(newFilters)
+              .filter(([_, val]) => val !== undefined && val !== null && val.toString().trim() !== '')
+          );
+          onFilter(cleanedFilters);
+        }, 300); // Reduced debounce time for better UX
+      }
     },
-    [onFilter]
+    [localFilters, onFilter]
   );
 
   // Inline editing
@@ -337,7 +361,7 @@ const DataTable = ({
       {/* Filter Toggle */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          {/* <button
+          <button
             className="px-3 py-1 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -347,7 +371,7 @@ const DataTable = ({
             <span className="px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
               {activeFilterCount} active
             </span>
-          )} */}
+          )}
         </div>
         <div className="text-sm text-neutral-500">
           Showing {startItem} to {endItem} of{" "}
@@ -366,22 +390,25 @@ const DataTable = ({
                 col.key !== "select" &&
                 col.key !== "actions"
             )
-            .map((column) => (
-              <div key={column.key} className="flex flex-col text-sm">
-                <label className="mb-1 text-neutral-700 font-medium">
-                  {column.title}
-                </label>
-                <input
-                  type="text"
-                  placeholder={`Filter ${column.title}...`}
-                  value={localFilters[column.key] || ""}
-                  onChange={(e) =>
-                    handleFilterChange(column.key, e.target.value)
-                  }
-                  className="border border-neutral-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-300"
-                />
-              </div>
-            ))}
+            .map((column) => {
+              const filterValue = localFilters[column.key] || '';
+              return (
+                <div key={column.key} className="flex flex-col text-sm">
+                  <label className="mb-1 text-neutral-700 font-medium">
+                    {column.title}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={`Filter ${column.title}...`}
+                    value={filterValue}
+                    onChange={(e) =>
+                      handleFilterChange(column.key, e.target.value)
+                    }
+                    className="border border-neutral-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-300"
+                  />
+                </div>
+              );
+            })}
           {activeFilterCount > 0 && (
             <div className="flex items-end">
               <button

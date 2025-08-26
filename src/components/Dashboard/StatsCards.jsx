@@ -22,7 +22,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Active Plants",
-      value: metrics?.activeUsers?.toLocaleString() || "892",
+      value: metrics?.activePlants?.toLocaleString() || "892",
       change: "+8%",
       changeType: "increase",
       icon: Users,
@@ -30,7 +30,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Total Locations",
-      value: metrics?.totalProjects || "24",
+      value: metrics?.totalLocations || "24",
       change: "+3",
       changeType: "increase",
       icon: Locate,
@@ -38,7 +38,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Total Pallets",
-      value: metrics?.totalProjects || "24",
+      value: metrics?.totalPallets || "24",
       change: "+3",
       changeType: "increase",
       icon: Palette,
@@ -76,7 +76,7 @@ const StatsCards = ({ metrics }) => {
                 <p className="text-2xl font-semibold text-gray-900 mt-1">
                   {stat.value}
                 </p>
-                <div className="mt-3 flex items-center">
+                {/* <div className="mt-3 flex items-center">
                   <TrendIcon
                     className={`w-2 h-4 ${
                       stat.changeType === "increase"
@@ -96,7 +96,7 @@ const StatsCards = ({ metrics }) => {
                   <span className="ml-1 text-[10px] text-gray-500">
                     from last month
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

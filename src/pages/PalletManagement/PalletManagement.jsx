@@ -282,27 +282,26 @@ const PalletManagement = () => {
     }
   };
 
-
   const handlePageChange = (newPage, newLimit) => {
     if (newLimit && newLimit !== pagination.limit) {
       // Handle limit change
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         page: 1, // Reset to first page when changing limit
-        limit: newLimit
+        limit: newLimit,
       }));
     } else if (newPage !== pagination.page) {
       // Handle page change
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
-        page: newPage
+        page: newPage,
       }));
     }
   };
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
   };
 
   const handleSort = ({ key, direction }) => {
@@ -314,11 +313,13 @@ const PalletManagement = () => {
       key: "barcode_key",
       title: "Barcode",
       sortable: true,
+      filterable: true,
     },
     {
       key: "status",
       title: "Status",
       sortable: true,
+      filterable: true,
       render: (status) => (
         <span
           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -337,33 +338,39 @@ const PalletManagement = () => {
       key: "sequenceNumber",
       title: "Sequence Number",
       sortable: true,
+      filterable: true,
     },
     {
       key: "sequence",
       title: "Sequence",
       sortable: true,
+      filterable: true,
     },
     {
       key: "size",
       title: "Size",
       sortable: true,
+      filterable: false,
     },
     {
       key: "last_moved_date",
       title: "Last Moved",
       sortable: true,
+      filterable: false,
       render: (date) => (date ? new Date(date).toLocaleDateString() : ""),
     },
     {
       key: "quantity",
       title: "Quantity",
       sortable: true,
+      filterable: true,
       render: (qty) => qty?.toLocaleString() || "0",
     },
     {
       key: "location_name",
       title: "Location",
       sortable: true,
+      filterable: false,
     },
     {
       key: "actions",
