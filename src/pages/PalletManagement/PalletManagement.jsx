@@ -173,11 +173,10 @@ const PalletManagement = () => {
 
     try {
       setIsGenerating(true);
-      // Send count as a query parameter as expected by the backend
       const response = await apiRequest(
         `pallet-barcode/generate?count=1`, // Generate one barcode at a time
         "POST",
-        {}, // Empty body since we're using query params
+        { warehouseId: currentWarehouse._id }, // Include warehouse ID in the request body
         true // authRequired
       );
 
