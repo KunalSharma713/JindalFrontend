@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ChevronDown, Check, Factory } from 'lucide-react';
-import { setSelectedPlant } from '../../store/slices/plantSlice';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ChevronDown, Check, Factory } from "lucide-react";
+import { setSelectedPlant } from "../../store/slices/plantSlice";
+import { toast } from "react-hot-toast";
 import { useApi } from "../../hooks/useApi";
 
 const PlantSwitcher = () => {
@@ -16,50 +16,56 @@ const PlantSwitcher = () => {
   useEffect(() => {
     const fetchWarehouses = async () => {
       try {
-        const response = await apiRequest('warehouse', 'GET');
+        const response = await apiRequest("warehouse", "GET");
         const warehouses = Array.isArray(response?.data) ? response.data : [];
         setPlants(warehouses);
-        
+
         // Safely get and parse the selected plant from localStorage
         let savedPlant = null;
         try {
-          const savedPlantStr = localStorage.getItem('selectedPlant');
+          const savedPlantStr = localStorage.getItem("selectedPlant");
           if (savedPlantStr) {
             savedPlant = JSON.parse(savedPlantStr);
             // Validate the parsed plant object
-            if (!savedPlant || typeof savedPlant !== 'object' || !savedPlant._id) {
-              throw new Error('Invalid plant data in localStorage');
+            if (
+              !savedPlant ||
+              typeof savedPlant !== "object" ||
+              !savedPlant._id
+            ) {
+              throw new Error("Invalid plant data in localStorage");
             }
             // Verify the plant exists in the fetched list
-            if (!warehouses.some(p => p._id === savedPlant._id)) {
-              console.log('Saved plant not found in warehouse list, clearing selection');
+            if (!warehouses.some((p) => p._id === savedPlant._id)) {
+              console.log(
+                "Saved plant not found in warehouse list, clearing selection"
+              );
               savedPlant = null;
               // Clean up invalid data
-              localStorage.removeItem('selectedPlant');
-              localStorage.removeItem('selectedPlantId');
-              localStorage.removeItem('selectedPlantName');
+              localStorage.removeItem("selectedPlant");
+              localStorage.removeItem("selectedPlantId");
+              localStorage.removeItem("selectedPlantName");
             }
           }
         } catch (e) {
-          console.error('Error processing saved plant:', e);
+          console.error("Error processing saved plant:", e);
           // Clean up any corrupted data
-          localStorage.removeItem('selectedPlant');
-          localStorage.removeItem('selectedPlantId');
-          localStorage.removeItem('selectedPlantName');
+          localStorage.removeItem("selectedPlant");
+          localStorage.removeItem("selectedPlantId");
+          localStorage.removeItem("selectedPlantName");
           savedPlant = null;
         }
-        
+
         // If no valid saved plant, select the first one if available
         if (!savedPlant && warehouses.length > 0) {
-          console.log('No valid saved plant, selecting first available');
+          console.log("No valid saved plant, selecting first available");
           handleSelectPlant(warehouses[0], false);
         } else if (savedPlant) {
-          console.log('Using saved plant from localStorage');
+          console.log("Using saved plant from localStorage");
           dispatch(setSelectedPlant(savedPlant));
         }
       } catch (err) {
-        console.error('Error fetching warehouses:', err);
-        toast.error('Failed to load plants');
+        console.error("Error fetching warehouses:", err);
+        toast.error("Failed to load plants");
         setError(err.message);
       } finally {
         setLoading(false);
@@ -71,8 +77,8 @@ const PlantSwitcher = () => {
 
   const handleSelectPlant = async (plant, shouldReload = true) => {
     if (!plant || !plant._id) {
-      console.error('Invalid plant data provided');
-      toast.error('Invalid plant data');
+      console.error("Invalid plant data provided");
+      toast.error("Invalid plant data");
       return;
     }
 
@@ -80,33 +86,36 @@ const PlantSwitcher = () => {
       // Prepare plant data
       const plantData = {
         _id: plant._id,
-        name: plant.name || '',
-        warehouse_name: plant.warehouse_name || '',
-        code: plant.code || ''
+        name: plant.name || "",
+        warehouse_name: plant.warehouse_name || "",
+        code: plant.code || "",
       };
 
       // Create a plain action object
       const action = {
-        type: 'plant/setSelectedPlant',
-        payload: plantData
+        type: "plant/setSelectedPlant",
+        payload: plantData,
       };
-      
+
       // Dispatch the plain action object
       dispatch(action);
-      
+
       // Save to localStorage
-      localStorage.setItem('selectedPlant', JSON.stringify(plantData));
-      localStorage.setItem('selectedPlantId', plantData._id);
-      localStorage.setItem('selectedPlantName', plantData.warehouse_name || plantData.name || '');
-      
+      localStorage.setItem("selectedPlant", JSON.stringify(plantData));
+      localStorage.setItem("selectedPlantId", plantData._id);
+      localStorage.setItem(
+        "selectedPlantName",
+        plantData.warehouse_name || plantData.name || ""
+      );
+
       // Dispatch storage event to notify other components
-      window.dispatchEvent(new Event('storage'));
-      
+      window.dispatchEvent(new Event("storage"));
+
       // Close the dropdown
       setIsOpen(false);
-      
+
       if (shouldReload) {
-        const toastId = toast.loading('Switching plant...');
+        const toastId = toast.loading("Switching plant...");
         // Small delay to ensure state is updated before reload
         setTimeout(() => {
           toast.dismiss(toastId);
@@ -115,41 +124,40 @@ const PlantSwitcher = () => {
         }, 100);
       }
     } catch (error) {
-      console.error('Error selecting plant:', error);
-      toast.error('Failed to switch plant');
-      
+      console.error("Error selecting plant:", error);
+      toast.error("Failed to switch plant");
+
       // Clean up potentially corrupted data
       try {
-        localStorage.removeItem('selectedPlant');
-        localStorage.removeItem('selectedPlantId');
-        localStorage.removeItem('selectedPlantName');
+        localStorage.removeItem("selectedPlant");
+        localStorage.removeItem("selectedPlantId");
+        localStorage.removeItem("selectedPlantName");
       } catch (cleanupError) {
-        console.error('Error cleaning up localStorage:', cleanupError);
+        console.error("Error cleaning up localStorage:", cleanupError);
       }
     }
   };
 
-  if (loading) return (
-    <div className="px-3 py-2 text-sm text-gray-500 flex items-center">
-      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
-      Loading plants...
-    </div>
-  );
-  
-  if (error) return (
-    <div className="px-3 py-2 text-sm text-red-500">
-      Error loading plants
-    </div>
-  );
-  
-  if (!plants || plants.length === 0) return (
-    <div className="px-3 py-2 text-sm text-gray-500">
-      No plants available
-    </div>
-  );
-  
+  if (loading)
+    return (
+      <div className="px-3 py-2 text-sm text-gray-500 flex items-center">
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
+        Loading plants...
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="px-3 py-2 text-sm text-red-500">Error loading plants</div>
+    );
+
+  if (!plants || plants.length === 0)
+    return (
+      <div className="px-3 py-2 text-sm text-gray-500">No plants available</div>
+    );
+
   const currentPlant = selectedPlant || (plants.length > 0 ? plants[0] : null);
-  
+  console.log("currentPlant", currentPlant);
   if (!currentPlant) return null;
 
   return (
@@ -165,10 +173,12 @@ const PlantSwitcher = () => {
           </div>
           <div className="text-left">
             <p className="text-sm font-medium text-gray-900">
-              {currentPlant.warehouse_name || currentPlant.name || 'Select Plant'}
+              {currentPlant.warehouse_name ||
+                currentPlant.name ||
+                "Select Plant"}
             </p>
             <p className="text-xs text-gray-500">
-              {currentPlant.code || 'Plant Code'}
+              {currentPlant.code || ""}
             </p>
           </div>
         </div>
@@ -187,7 +197,7 @@ const PlantSwitcher = () => {
                   key={plant._id}
                   onClick={() => handleSelectPlant(plant)}
                   className={`w-full px-4 py-3 text-sm flex items-center hover:bg-gray-50 ${
-                    currentPlant?._id === plant._id ? 'bg-blue-50' : ''
+                    currentPlant?._id === plant._id ? "bg-blue-50" : ""
                   }`}
                 >
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
@@ -198,7 +208,9 @@ const PlantSwitcher = () => {
                       {plant.warehouse_name || plant.name}
                     </p>
                     <div className="flex items-center mt-0.5">
-                      <span className="text-xs text-gray-500">{plant.code || 'No code'}</span>
+                      <span className="text-xs text-gray-500">
+                        {plant.code || "No code"}
+                      </span>
                       {currentPlant?._id === plant._id && (
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                           Current
