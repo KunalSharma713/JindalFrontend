@@ -78,7 +78,7 @@ const UserModal = ({ isOpen, onClose }) => {
 
       if (isEditing) {
         // For editing, use the _id from selectedUser
-        const response = await apiRequest(`user/${selectedUser._id}`, "PUT", true);
+        const response = await apiRequest(`user/${selectedUser._id}`, "PUT", payload);
         const transformedUser = {
           ...response,
           name: `${response.first_name} ${response.last_name}`,

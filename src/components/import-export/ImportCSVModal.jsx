@@ -82,7 +82,7 @@ const ImportCSVModal = ({
   };
 
   return (
-    <Modal
+    <div
       isOpen={isOpen}
       onClose={() => {
         closeModal();
@@ -187,7 +187,7 @@ const ImportCSVModal = ({
           </div>
         </form>
       </div>
-    </Modal>
+    </div>
   );
 };
 
@@ -271,50 +271,62 @@ const Handler = ({
 const RequestList = ({ listType, customColumns, type }) => {
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [getlocationFetchResponse, setGetLocationFetchResponse] = useState({
+    data: { records: [], totalCount: 0 },
+    fetching: false,
+    error: false,
+  });
 
   const changePageRowHandle = async (page, pageSizes) => {
-    await getCompanyFetchHandler();
     setPageNo(page);
     setPageSize(pageSizes);
   };
 
-  const [getCompanyFetchResponse, getCompanyFetchHandler] = useFetchAPI(
-    {
-      url: `/bulkupload/${type}/upload`,
-      method: "POST",
-      body: {
+  const getLocationFetchHandler = useCallback(async () => {
+    setGetLocationFetchResponse((prev) => ({
+      ...prev,
+      fetching: true,
+      error: false,
+    }));
+
+    try {
+      const response = await apiRequest(`/bulkupload/${type}/upload`, "POST", {
         page_size: pageSize,
         page_no: pageNo,
-      },
-    },
-    (e) => {
-      return e;
-    },
-    (e) => {
-      return e?.response ?? true;
+      });
+
+      setGetLocationFetchResponse({
+        data: response?.data ?? { records: [], totalCount: 0 },
+        fetching: false,
+        error: false,
+      });
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to fetch data.");
+      setGetLocationFetchResponse((prev) => ({
+        ...prev,
+        fetching: false,
+        error: true,
+      }));
     }
-  );
+  }, [type, pageNo, pageSize]);
 
   useEffect(() => {
     if (listType === "RequestList") {
-      getCompanyFetchHandler({
-        body: {
-          page_size: pageSize,
-          page_no: pageNo,
-        },
-      });
+      getLocationFetchHandler();
     }
-  }, [listType]);
+  }, [listType, getLocationFetchHandler]);
+
   return (
     <>
       <div className="mt-2">
         <DataTable
-          dataRows={getCompanyFetchResponse?.data?.records ?? []}
-          isLoading={getCompanyFetchResponse?.fetching}
-          isError={getCompanyFetchResponse?.error}
+          dataRows={getlocationFetchResponse?.data?.records ?? []}
+          isLoading={getlocationFetchResponse?.fetching}
+          isError={getlocationFetchResponse?.error}
           listComponent={customColumns}
           changeRowPage={changePageRowHandle}
-          totalRows={Number(getCompanyFetchResponse?.data?.totalCount)}
+          totalRows={Number(getlocationFetchResponse?.data?.totalCount)}
           currentPage={pageNo}
           currentRows={pageSize}
         />
