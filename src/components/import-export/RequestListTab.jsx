@@ -1,47 +1,96 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Clock, CheckCircle, XCircle, Search, RefreshCw } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import bulkUploadService from '../../services/bulkUploadService';
-import { useApi } from '../../hooks/useApi';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  Search,
+  RefreshCw,
+  Check,
+} from "lucide-react";
+import { toast } from "react-hot-toast";
+import bulkUploadService from "../../services/bulkUploadService";
+import { useApi } from "../../hooks/useApi";
 
-const RequestListTab = ({ warehouseId }) => {
+const RequestListTab = ({ warehouseId, onViewBulkRecords }) => {
   const { apiRequest } = useApi();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 1
+    totalPages: 1,
   });
-  
-  // Track the current tab (all/success/error)
-  const [activeTab, setActiveTab] = useState('all');
+
+  const [selectedBulkId, setSelectedBulkId] = useState(null);
+  const [records, setRecords] = useState({ success: [], errors: [] });
+  const [loadingRecords, setLoadingRecords] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
   // Initialize the service when the component mounts
   useEffect(() => {
     bulkUploadService.init(apiRequest);
-  }, [apiRequest]);
+
+    // If we have a selectedBulkId, fetch its records
+    if (selectedBulkId) {
+      handleViewBulkRecords(selectedBulkId);
+    }
+  }, [apiRequest, selectedBulkId]);
+
+  const handleViewBulkRecords = async (bulkId) => {
+    if (!bulkId) return;
+
+    try {
+      setLoadingRecords(true);
+      setSelectedBulkId(bulkId);
+
+      // If onViewBulkRecords is provided, call it to notify parent component
+      if (onViewBulkRecords) {
+        onViewBulkRecords(bulkId);
+      }
+
+      // Fetch both success and error records for this bulk ID
+      const [successResponse, errorResponse] = await Promise.all([
+        bulkUploadService.getSuccessRecords(bulkId, 1, 100),
+        bulkUploadService.getErrorRecords(bulkId, 1, 100),
+      ]);
+
+      setRecords({
+        success: successResponse?.records || [],
+        errors: errorResponse?.records || [],
+      });
+    } catch (err) {
+      console.error("Failed to fetch records:", err);
+      toast.error("Failed to load records");
+    } finally {
+      setLoadingRecords(false);
+    }
+  };
+
+  const handleBackToList = () => {
+    setSelectedBulkId(null);
+    setRecords({ success: [], errors: [] });
+  };
 
   const fetchRequests = useCallback(async () => {
     if (!warehouseId) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       let response;
-      
+
       // Fetch data based on active tab
-      if (activeTab === 'success') {
+      if (activeTab === "success") {
         response = await bulkUploadService.getSuccessRecords(
           warehouseId,
           pagination.page,
           pagination.limit
         );
-      } else if (activeTab === 'error') {
+      } else if (activeTab === "error") {
         response = await bulkUploadService.getErrorRecords(
           warehouseId,
           pagination.page,
@@ -54,33 +103,36 @@ const RequestListTab = ({ warehouseId }) => {
           searchTerm
         );
       }
-      
+
       if (response) {
         // Handle both array and object responses
-        const data = Array.isArray(response) ? response : (response.data || []);
+        const data = Array.isArray(response?.records) ? response?.records : [];
         setRequests(data);
-        
+
         // Update pagination if available
         if (response.pagination) {
-          setPagination(prev => ({
+          setPagination((prev) => ({
             ...prev,
             total: response.pagination.total || data.length,
-            totalPages: response.pagination.totalPages || 
-              Math.ceil((response.pagination.total || data.length) / pagination.limit)
+            totalPages:
+              response.pagination.totalPages ||
+              Math.ceil(
+                (response.pagination.total || data.length) / pagination.limit
+              ),
           }));
         } else if (Array.isArray(response)) {
           // If response is an array, update pagination based on array length
-          setPagination(prev => ({
+          setPagination((prev) => ({
             ...prev,
             total: response.length,
-            totalPages: Math.ceil(response.length / pagination.limit)
+            totalPages: Math.ceil(response.length / pagination.limit),
           }));
         }
       }
     } catch (err) {
-      console.error('Error fetching import requests:', err);
-      setError(err.message || 'Failed to load import requests');
-      toast.error('Failed to load import requests');
+      console.error("Error fetching import requests:", err);
+      setError(err.message || "Failed to load import requests");
+      toast.error("Failed to load import requests");
     } finally {
       setLoading(false);
     }
@@ -89,38 +141,103 @@ const RequestListTab = ({ warehouseId }) => {
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
-  
+
   const handleRefresh = () => {
     fetchRequests();
   };
-  
+
   const handlePageChange = (newPage) => {
-    setPagination(prev => ({
+    setPagination((prev) => ({
       ...prev,
-      page: newPage
+      page: newPage,
     }));
   };
 
   const getStatusIcon = (status) => {
     if (!status) return null;
-    
+
     const statusMap = {
-      'completed': <CheckCircle className="h-4 w-4 text-green-500" />,
-      'failed': <XCircle className="h-4 w-4 text-red-500" />,
-      'processing': <Clock className="h-4 w-4 text-yellow-500 animate-pulse" />,
-      'pending': <Clock className="h-4 w-4 text-blue-500" />
+      success: <CheckCircle className="h-4 w-4 text-green-500" />,
+      failed: <XCircle className="h-4 w-4 text-red-500" />,
+      processing: <Clock className="h-4 w-4 text-yellow-500 animate-pulse" />,
+      pending: <Clock className="h-4 w-4 text-blue-500" />,
     };
     return statusMap[status.toLowerCase()] || null;
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Import Requests</h3>
-        
-        {/* Tabs */}
+  // Render records view when a bulk ID is selected
+  if (selectedBulkId) {
+    const renderRecordsTable = (records, isError = false) => {
+      const recordList = isError ? records.errors : records.success;
+      const recordType = isError ? 'error' : 'success';
+      const isEmpty = recordList.length === 0;
+      
+      if (isEmpty) {
+        return (
+          <div className="text-center py-8 text-gray-500">
+            No {recordType} records found.
+          </div>
+        );
+      }
+
+      const headers = recordList.length > 0 ? Object.keys(recordList[0]) : [];
+      
+      return (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {headers.map((header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {recordList.map((record, idx) => (
+                <tr key={idx} className={isError ? 'bg-red-50' : 'hover:bg-gray-50'}>
+                  {Object.values(record).map((value, i) => (
+                    <td 
+                      key={i} 
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        isError ? 'text-gray-900' : 'text-gray-500'
+                      }`}
+                    >
+                      {String(value)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handleBackToList}
+            className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
+          >
+            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to list
+          </button>
+          <h3 className="text-lg font-medium">
+            Records for Upload: <span className="font-mono text-sm">{selectedBulkId}</span>
+          </h3>
+          <div className="w-24"></div>
+        </div>
+
         <div className="flex border-b border-gray-200">
-          {['all', 'success', 'error'].map((tab) => (
+          {['success', 'error'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -131,10 +248,28 @@ const RequestListTab = ({ warehouseId }) => {
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {' '}
+              <span className="text-xs text-gray-400">
+                ({tab === 'success' ? records.success.length : records.errors.length})
+              </span>
             </button>
           ))}
         </div>
-        
+
+        <div className="space-y-6">
+          {activeTab === 'success' && renderRecordsTable(records, false)}
+          {activeTab === 'error' && renderRecordsTable(records, true)}
+        </div>
+      </div>
+    );
+  }
+
+  // Render the main list view when no bulk ID is selected
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Import Requests</h3>
+
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRefresh}
@@ -142,7 +277,11 @@ const RequestListTab = ({ warehouseId }) => {
             className="p-1.5 rounded-full hover:bg-gray-100"
             title="Refresh"
           >
-            <RefreshCw className={`h-4 w-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 text-gray-500 ${
+                loading ? "animate-spin" : ""
+              }`}
+            />
           </button>
           <div className="relative w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -159,7 +298,7 @@ const RequestListTab = ({ warehouseId }) => {
           </div>
         </div>
       </div>
-      
+
       {error && (
         <div className="rounded-md bg-red-50 p-4">
           <div className="flex">
@@ -187,16 +326,28 @@ const RequestListTab = ({ warehouseId }) => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  File
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Bulk Upload ID
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Records
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Date
                 </th>
               </tr>
@@ -204,65 +355,95 @@ const RequestListTab = ({ warehouseId }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading && requests.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
+                  >
                     Loading...
                   </td>
                 </tr>
               ) : requests.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
+                  >
                     No import requests found
                   </td>
                 </tr>
               ) : (
-                requests.map((req) => (
-                  <tr key={req._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {req.fileName || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getStatusIcon(req.status)}
-                        <span className={`ml-2 text-sm capitalize ${
-                          req.status === 'completed' ? 'text-green-600' :
-                          req.status === 'failed' ? 'text-red-600' :
-                          'text-yellow-600'
-                        }`}>
-                          {bulkUploadService.getStatusDisplay(req.status).text}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {req.total_records || '0'}
-                      {req.total_success !== undefined && (
-                        <span className="text-green-600 ml-2">
-                          ({req.total_success} success, {req.total_error || 0} errors)
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {bulkUploadService.formatDate(req.created_at || req.updated_at)}
-                    </td>
-                  </tr>
-                ))
+                requests.map((req) => {
+                  return (
+                    <tr
+                      key={req._id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      // onClick={() => handleViewBulkRecords(req._id)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-800">
+                        <div className="flex items-center">
+                          {req._id || "N/A"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {getStatusIcon(req.status)}
+                          <span
+                            className={`ml-2 text-sm capitalize ${
+                              req.status === "success"
+                                ? "text-green-600"
+                                : req.status === "failed"
+                                ? "text-red-600"
+                                : "text-yellow-600"
+                            }`}
+                          >
+                            {
+                              bulkUploadService.getStatusDisplay(req.status)
+                                .text
+                            }
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {req.total_records || "0"}
+                        {req.total_success !== undefined && (
+                          <span className="text-green-600 ml-2">
+                            ({req.total_success} success, {req.total_error || 0}{" "}
+                            errors)
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {bulkUploadService.formatDate(
+                          req.created_at || req.updated_at
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {pagination.totalPages > 1 && (
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
-                onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
+                onClick={() =>
+                  handlePageChange(Math.max(1, pagination.page - 1))
+                }
                 disabled={pagination.page === 1 || loading}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
                 Previous
               </button>
               <button
-                onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.page + 1))}
+                onClick={() =>
+                  handlePageChange(
+                    Math.min(pagination.totalPages, pagination.page + 1)
+                  )
+                }
                 disabled={pagination.page === pagination.totalPages || loading}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
@@ -272,15 +453,26 @@ const RequestListTab = ({ warehouseId }) => {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+                  Showing{" "}
                   <span className="font-medium">
-                    {Math.min(pagination.page * pagination.limit, pagination.total)}
-                  </span>{' '}
-                  of <span className="font-medium">{pagination.total}</span> results
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}
+                  </span>{" "}
+                  of <span className="font-medium">{pagination.total}</span>{" "}
+                  results
                 </p>
               </div>
               <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <nav
+                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                  aria-label="Pagination"
+                >
                   <button
                     onClick={() => handlePageChange(1)}
                     disabled={pagination.page === 1 || loading}
@@ -290,46 +482,57 @@ const RequestListTab = ({ warehouseId }) => {
                     &laquo;
                   </button>
                   <button
-                    onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
+                    onClick={() =>
+                      handlePageChange(Math.max(1, pagination.page - 1))
+                    }
                     disabled={pagination.page === 1 || loading}
                     className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     <span className="sr-only">Previous</span>
                     &lsaquo;
                   </button>
-                  
+
                   {/* Page numbers */}
-                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (pagination.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (pagination.page <= 3) {
-                      pageNum = i + 1;
-                    } else if (pagination.page >= pagination.totalPages - 2) {
-                      pageNum = pagination.totalPages - 4 + i;
-                    } else {
-                      pageNum = pagination.page - 2 + i;
+                  {Array.from(
+                    { length: Math.min(5, pagination.totalPages) },
+                    (_, i) => {
+                      let pageNum;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (pagination.page <= 3) {
+                        pageNum = i + 1;
+                      } else if (pagination.page >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = pagination.page - 2 + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          disabled={loading}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            pagination.page === pageNum
+                              ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
                     }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        disabled={loading}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          pagination.page === pageNum
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                  
+                  )}
+
                   <button
-                    onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.page + 1))}
-                    disabled={pagination.page === pagination.totalPages || loading}
+                    onClick={() =>
+                      handlePageChange(
+                        Math.min(pagination.totalPages, pagination.page + 1)
+                      )
+                    }
+                    disabled={
+                      pagination.page === pagination.totalPages || loading
+                    }
                     className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     <span className="sr-only">Next</span>
@@ -337,7 +540,9 @@ const RequestListTab = ({ warehouseId }) => {
                   </button>
                   <button
                     onClick={() => handlePageChange(pagination.totalPages)}
-                    disabled={pagination.page === pagination.totalPages || loading}
+                    disabled={
+                      pagination.page === pagination.totalPages || loading
+                    }
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     <span className="sr-only">Last</span>

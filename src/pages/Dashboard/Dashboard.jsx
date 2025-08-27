@@ -15,7 +15,6 @@ const Dashboard = () => {
     return warehouseId ? { _id: warehouseId } : null;
   });
   useEffect(() => {
-    console.log("metrics", metrics);
     const fetchMetrics = async () => {
       const warehouseId = localStorage.getItem("selectedPlantId");
       if (!warehouseId) return;

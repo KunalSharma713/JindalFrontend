@@ -1,21 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { Upload as UploadIcon, FileText, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { useApi } from '../../hooks/useApi';
 
 export default function UploadedTab({ 
   fileName, 
   onFileRemove, 
   onFileUpload, 
   isImporting,
-  onDownloadTemplate,
-  onImport,
-  isValid
+  onDownloadTemplate
 }) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
-
-  const { apiRequest } = useApi();
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     if (rejectedFiles && rejectedFiles.length > 0) {
@@ -90,44 +85,44 @@ export default function UploadedTab({
       )}
       <div className="mt-6">
         {fileName ? (
-          <div className="p-4 border-2 border-dashed border-green-500 rounded-lg bg-green-50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <FileText className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-sm font-medium text-gray-700">{fileName}</span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  type="button"
-                  onClick={onFileRemove}
-                  className="text-gray-400 hover:text-gray-500"
-                  disabled={isImporting}
-                >
-                  Remove File
-                </button>
-                <button
-                  type="button"
-                  onClick={onImport}
-                  disabled={!isValid || isImporting}
-                  className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                    isValid && !isImporting 
-                      ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500' 
-                      : 'bg-blue-400 cursor-not-allowed'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                >
-                  {isImporting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Importing...
-                    </>
-                  ) : (
-                    'Import File'
-                  )}
-                </button>
-              </div>
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">File Details</h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">Details about the uploaded file</p>
+            </div>
+            <div className="border-t border-gray-200">
+              <dl>
+                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">File name</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 flex items-center">
+                    <FileText className="h-5 w-5 text-blue-500 mr-2" />
+                    {fileName}
+                  </dd>
+                </div>
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">File type</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">CSV</dd>
+                </div>
+                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">Status</dt>
+                  <dd className="mt-1 text-sm text-green-600 sm:mt-0 sm:col-span-2">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Ready to import
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={onFileRemove}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={isImporting}
+              >
+                <X className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
+                Remove File
+              </button>
             </div>
           </div>
         ) : (
@@ -168,24 +163,6 @@ export default function UploadedTab({
             </div>
           </div>
         )}
-      </div>
-
-      <div className="mt-6 border-t border-gray-200 pt-4">
-        <h4 className="text-sm font-medium text-gray-900">Requirements:</h4>
-        <ul className="mt-2 space-y-2 text-sm text-gray-500">
-          <li className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-            <span>File must be in CSV format</span>
-          </li>
-          <li className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-            <span>Required fields: Location Name, Latitude, Longitude</span>
-          </li>
-          <li className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-            <span>Maximum file size: 10MB</span>
-          </li>
-        </ul>
       </div>
     </div>
   );

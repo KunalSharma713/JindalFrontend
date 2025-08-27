@@ -8,6 +8,7 @@ import {
   Locate,
   TrendingUp,
   TrendingDown,
+  Factory
 } from "lucide-react";
 
 const StatsCards = ({ metrics }) => {
@@ -25,7 +26,7 @@ const StatsCards = ({ metrics }) => {
       value: metrics?.activePlants?.toLocaleString() || "0",
       change: "+8%",
       changeType: "increase",
-      icon: Users,
+      icon: Factory,
       color: "bg-green-600",
     },
     {
