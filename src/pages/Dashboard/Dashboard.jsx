@@ -10,12 +10,16 @@ import { useApi } from "../../hooks/useApi";
 const Dashboard = () => {
   const [metrics, setMetrics] = useState({});
   const { apiRequest } = useApi();
-
+  const [currentWarehouse, setCurrentWarehouse] = useState(() => {
+    const warehouseId = localStorage.getItem("selectedPlantId");
+    return warehouseId ? { _id: warehouseId } : null;
+  });
   useEffect(() => {
+    console.log("metrics", metrics);
     const fetchMetrics = async () => {
       const warehouseId = localStorage.getItem("selectedPlantId");
       if (!warehouseId) return;
-
+      setCurrentWarehouse(warehouseId);
       const endpoints = [
         { key: "totalUsers", url: `user/?warehouse=${warehouseId}` },
         { key: "totalLocations", url: `location/?warehouse=${warehouseId}` },
@@ -35,7 +39,7 @@ const Dashboard = () => {
     };
 
     fetchMetrics();
-  }, [apiRequest]);
+  }, [apiRequest, currentWarehouse]);
 
   return (
     <div className="space-y-6">

@@ -14,7 +14,7 @@ const StatsCards = ({ metrics }) => {
   const stats = [
     {
       name: "Total Users",
-      value: metrics?.totalUsers?.toLocaleString() || "1,247",
+      value: metrics?.totalUsers?.toLocaleString() || "0",
       change: "+12%",
       changeType: "increase",
       icon: Users,
@@ -22,7 +22,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Active Plants",
-      value: metrics?.activePlants?.toLocaleString() || "892",
+      value: metrics?.activePlants?.toLocaleString() || "0",
       change: "+8%",
       changeType: "increase",
       icon: Users,
@@ -30,7 +30,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Total Locations",
-      value: metrics?.totalLocations || "24",
+      value: metrics?.totalLocations || "0",
       change: "+3",
       changeType: "increase",
       icon: Locate,
@@ -38,7 +38,7 @@ const StatsCards = ({ metrics }) => {
     },
     {
       name: "Total Pallets",
-      value: metrics?.totalPallets || "24",
+      value: metrics?.totalPallets || "0",
       change: "+3",
       changeType: "increase",
       icon: Palette,
