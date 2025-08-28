@@ -1,9 +1,6 @@
 import { useState, useCallback } from "react";
 
-//Prod
-const BASE_URL = "https://bhoomiapps.thevivapower.com/api/";
-
-// const BASE_URL = "http://localhost:5000/api/";
+const BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);

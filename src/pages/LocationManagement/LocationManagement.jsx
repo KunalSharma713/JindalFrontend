@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Edit3, Trash2, MapPin, Upload } from "lucide-react";
+import { Plus, Edit3, Trash2, MapPin, Upload, FileText } from "lucide-react";
 import { toast } from "react-hot-toast";
 import DataTable from "../../components/DataTable";
 import LocationModal from "../../components/LocationManagement/LocationModal";
@@ -164,6 +164,58 @@ const LocationManagement = () => {
     }
   };
 
+  const handleDownloadPdf = async (locationId) => {
+    if (!locationId) {
+      console.error("No location ID provided for PDF download");
+      return;
+    }
+    try {
+      // Create a direct fetch request to handle the blob response
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_BASE_API_URL
+        }barcode-print/web/locations?id=${locationId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to download PDF");
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `location_barcode_${locationId}.pdf`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Cleanup
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      toast.error(error.message || "Failed to download PDF");
+    }
+  };
+
   const handleLocationCreated = () => {
     fetchLocations();
   };
@@ -227,7 +279,7 @@ const LocationManagement = () => {
         if (!row) return null;
 
         return (
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -247,6 +299,16 @@ const LocationManagement = () => {
               title="Delete location"
             >
               <Trash2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownloadPdf(row._id || row.id);
+              }}
+              className="text-green-600 hover:text-green-900"
+              title="Download Barcode PDF"
+            >
+              <FileText className="h-4 w-4" />
             </button>
           </div>
         );
@@ -306,12 +368,12 @@ const LocationManagement = () => {
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ["Location Name", "Latitude", "Longitude", "Barcode Key"];
+    const headers = ["Location Name", "Latitude", "Longitude"];
     const csvContent = [
       headers.join(","),
-      "Location 1,28.6139,77.2090,BC001",
-      "Location 2,19.0760,72.8777,BC002",
-      "Location 3,12.9716,77.5946,BC003",
+      "Location One,28.6139,77.2090",
+      "Location Two,19.0760,72.8777",
+      "Location Three,12.9716,77.5946",
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
