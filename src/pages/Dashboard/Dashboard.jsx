@@ -20,10 +20,10 @@ const Dashboard = () => {
       if (!warehouseId) return;
       setCurrentWarehouse(warehouseId);
       const endpoints = [
-        { key: "totalUsers", url: `user/?warehouse=${warehouseId}` },
-        { key: "totalLocations", url: `location/?warehouse=${warehouseId}` },
-        { key: "activePlants", url: `warehouse/?warehouse=${warehouseId}` },
-        { key: "totalPallets", url: `pallet/all?warehouse=${warehouseId}` },
+        { key: "totalUsers", url: `user/web/?warehouse=${warehouseId}` },
+        { key: "totalLocations", url: `location/web/?warehouse=${warehouseId}` },
+        { key: "activePlants", url: `warehouse/web/?warehouse=${warehouseId}` },
+        { key: "totalPallets", url: `pallet/web/all?warehouse=${warehouseId}` },
       ];
 
       for (const { key, url } of endpoints) {

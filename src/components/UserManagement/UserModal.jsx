@@ -78,7 +78,7 @@ const UserModal = ({ isOpen, onClose }) => {
 
       if (isEditing) {
         // For editing, use the _id from selectedUser
-        const response = await apiRequest(`user/${selectedUser._id}`, "PUT", payload);
+        const response = await apiRequest(`user/web/${selectedUser._id}`, "PUT", payload);
         const transformedUser = {
           ...response,
           name: `${response.first_name} ${response.last_name}`,
@@ -87,7 +87,7 @@ const UserModal = ({ isOpen, onClose }) => {
         dispatch(updateUser({ ...selectedUser, ...transformedUser }));
         toast.success('User updated successfully!');
       } else {
-        const response = await apiRequest("user/", "POST", payload, true);
+        const response = await apiRequest("user/web/", "POST", payload, true);
         const transformedUser = {
           ...response,
           name: `${response.first_name} ${response.last_name}`,

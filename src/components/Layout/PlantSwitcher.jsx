@@ -16,7 +16,7 @@ const PlantSwitcher = () => {
   useEffect(() => {
     const fetchWarehouses = async () => {
       try {
-        const response = await apiRequest("warehouse", "GET");
+        const response = await apiRequest("warehouse/web", "GET");
         const warehouses = Array.isArray(response?.data) ? response.data : [];
         setPlants(warehouses);
 

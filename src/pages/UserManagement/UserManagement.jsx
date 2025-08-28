@@ -32,9 +32,9 @@ const UserManagement = () => {
       const { key, direction } = sortConfig;
 
       // Get the selected plant ID from localStorage
-      const selectedPlantId = localStorage.getItem('selectedPlantId');
+      const selectedPlantId = localStorage.getItem("selectedPlantId");
       if (!selectedPlantId) {
-        throw new Error('No plant selected');
+        throw new Error("No plant selected");
       }
 
       // Build query params
@@ -42,17 +42,17 @@ const UserManagement = () => {
         page,
         limit,
         ...(key && { sortBy: key, sortOrder: direction }),
-        warehouse: selectedPlantId, 
+        warehouse: selectedPlantId,
       });
 
       // Add filters to the query params
       Object.entries(filters).forEach(([key, value]) => {
-        if (value && value.trim() !== '') {
+        if (value && value.trim() !== "") {
           params.append(key, value);
         }
       });
 
-      const response = await apiRequest(`user/?${params}`, "GET");
+      const response = await apiRequest(`user/web/?${params}`, "GET");
 
       if (response && response.data) {
         // Transform data to match DataTable expected format
@@ -94,7 +94,7 @@ const UserManagement = () => {
   const handleDelete = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await apiRequest(`user/${userId}`, "DELETE");
+        await apiRequest(`user/web/${userId}`, "DELETE");
         toast.success("User deleted successfully");
         fetchUsers(); // Refresh the list
       } catch (error) {
@@ -115,15 +115,20 @@ const UserManagement = () => {
   const handleFilter = useCallback((newFilters) => {
     // Clean up empty filters
     const cleanedFilters = Object.fromEntries(
-      Object.entries(newFilters)
-        .filter(([_, value]) => value !== undefined && value !== null && value.toString().trim() !== '')
+      Object.entries(newFilters).filter(
+        ([_, value]) =>
+          value !== undefined &&
+          value !== null &&
+          value.toString().trim() !== ""
+      )
     );
-    
+
     // Only update if filters actually changed
-    const filtersChanged = Object.keys({ ...cleanedFilters, ...filtersRef.current }).some(
-      key => cleanedFilters[key] !== filtersRef.current[key]
-    );
-    
+    const filtersChanged = Object.keys({
+      ...cleanedFilters,
+      ...filtersRef.current,
+    }).some((key) => cleanedFilters[key] !== filtersRef.current[key]);
+
     if (filtersChanged) {
       // Skip the first render to prevent double API call
       if (isInitialMount.current) {
@@ -131,10 +136,10 @@ const UserManagement = () => {
         filtersRef.current = cleanedFilters;
         return;
       }
-      
+
       setFilters(cleanedFilters);
       filtersRef.current = cleanedFilters;
-      setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+      setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
     }
   }, []);
 
@@ -157,15 +162,16 @@ const UserManagement = () => {
       sortable: true,
       filterable: true,
     },
-    {
-      key: "role",
-      title: "Role",
-      sortable: true,
-      filterable: false,
-    },
+    // {
+    //   key: "role",
+    //   title: "Role",
+    //   sortable: true,
+    //   filterable: false,
+    // },
     {
       key: "actions",
       title: "Actions",
+      sortable: false,
       render: (_, row) => (
         <div className="flex space-x-2">
           <button

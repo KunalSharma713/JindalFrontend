@@ -57,7 +57,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
       if (isEditing) {
         // For update, include the _id in the URL and send all fields
         const response = await apiRequest(
-          `warehouse/${warehouse._id}`, 
+          `warehouse/web/${warehouse._id}`, 
           "PUT", 
           {
             warehouse_name: formData.warehouse_name,
@@ -71,7 +71,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
       } else {
         // For create
         const response = await apiRequest(
-          "warehouse", 
+          "warehouse/web", 
           "POST", 
           {
             warehouse_name: formData.warehouse_name,

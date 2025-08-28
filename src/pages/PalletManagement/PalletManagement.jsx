@@ -39,7 +39,7 @@ const PalletManagement = () => {
       setLoading(true);
       const warehouseId = localStorage.getItem("selectedPlantId");
       const response = await apiRequest(
-        `location?warehouse=${warehouseId}`,
+        `location/web?warehouse=${warehouseId}`,
         "GET"
       );
       if (response && response.data) {
@@ -74,7 +74,7 @@ const PalletManagement = () => {
         warehouse: warehouseId,
       });
 
-      const response = await apiRequest(`pallet/all?${params}`, "GET");
+      const response = await apiRequest(`pallet/web/all?${params}`, "GET");
 
       if (response && response.data) {
         // Transform data to match DataTable expected format
@@ -174,7 +174,7 @@ const PalletManagement = () => {
     try {
       setIsGenerating(true);
       const response = await apiRequest(
-        `pallet-barcode/generate?count=1`, // Generate one barcode at a time
+        `pallet-barcode/web/generate?count=1`, // Generate one barcode at a time
         "POST",
         { warehouseId: currentWarehouse._id }, // Include warehouse ID in the request body
         true // authRequired
@@ -232,7 +232,7 @@ const PalletManagement = () => {
     }
     if (window.confirm("Are you sure you want to delete this location?")) {
       try {
-        await apiRequest(`location/${locationId}`, "DELETE");
+        await apiRequest(`location/web/${locationId}`, "DELETE");
         toast.success("Location deleted successfully");
         fetchLocations();
       } catch (error) {
@@ -251,7 +251,7 @@ const PalletManagement = () => {
       if (selectedPallet?._id) {
         // Update existing pallet
         response = await apiRequest(
-          `pallet/${selectedPallet.pallet_id}`,
+          `pallet/web/${selectedPallet.pallet_id}`,
           "PUT",
           {
             ...data,
@@ -261,7 +261,7 @@ const PalletManagement = () => {
         toast.success("Pallet updated successfully");
       } else if (selectedBarcode) {
         // Assign new pallet
-        response = await apiRequest("pallet/assign", "POST", {
+        response = await apiRequest("pallet/web/assign", "POST", {
           ...data,
           barcode_key: selectedBarcode.barcode_key,
           barcodeId: selectedBarcode._id,
@@ -375,6 +375,7 @@ const PalletManagement = () => {
     {
       key: "actions",
       title: "Actions",
+      sortable: false,
       render: (_, row) => (
         <div className="flex space-x-2">
           {!row.pallet ? (

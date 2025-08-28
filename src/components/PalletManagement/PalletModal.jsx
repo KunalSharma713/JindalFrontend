@@ -78,14 +78,14 @@ const PalletModal = ({
 
       if (isEditing) {
         const response = await apiRequest(
-          `location/${selectedLocation._id}`,
+          `location/web/${selectedLocation._id}`,
           "PUT",
           payload,
           true
         );
         toast.success("Location updated successfully!");
       } else {
-        const response = await apiRequest("location/", "POST", payload, true);
+        const response = await apiRequest("location/web/", "POST", payload, true);
         toast.success("Location added successfully!");
       }
 

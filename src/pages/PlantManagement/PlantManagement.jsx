@@ -36,17 +36,17 @@ const PlantManagement = () => {
       const params = new URLSearchParams({
         page,
         limit,
-        ...(key && { sortBy: key, sortOrder: direction })
+        ...(key && { sortBy: key, sortOrder: direction }),
       });
 
       // Add filters to the query params
       Object.entries(filters).forEach(([key, value]) => {
-        if (value && value.trim() !== '') {
+        if (value && value.trim() !== "") {
           params.append(key, value);
         }
       });
 
-      const response = await apiRequest(`warehouse?${params}`, "GET");
+      const response = await apiRequest(`warehouse/web?${params}`, "GET");
 
       if (response && response.data) {
         setWarehouses(response.data);
@@ -89,7 +89,7 @@ const PlantManagement = () => {
   const handleDeleteWarehouse = async (warehouseId) => {
     if (window.confirm("Are you sure you want to delete this plant?")) {
       try {
-        await apiRequest(`warehouse/${warehouseId}`, "DELETE");
+        await apiRequest(`warehouse/web/${warehouseId}`, "DELETE");
         toast.success("Plant deleted successfully");
         // Refresh the list and reset to first page
         setPagination((prev) => ({ ...prev, page: 1 }));
@@ -112,15 +112,20 @@ const PlantManagement = () => {
   const handleFilter = useCallback((newFilters) => {
     // Clean up empty filters
     const cleanedFilters = Object.fromEntries(
-      Object.entries(newFilters)
-        .filter(([_, value]) => value !== undefined && value !== null && value.toString().trim() !== '')
+      Object.entries(newFilters).filter(
+        ([_, value]) =>
+          value !== undefined &&
+          value !== null &&
+          value.toString().trim() !== ""
+      )
     );
-    
+
     // Only update if filters actually changed
-    const filtersChanged = Object.keys({ ...cleanedFilters, ...filtersRef.current }).some(
-      key => cleanedFilters[key] !== filtersRef.current[key]
-    );
-    
+    const filtersChanged = Object.keys({
+      ...cleanedFilters,
+      ...filtersRef.current,
+    }).some((key) => cleanedFilters[key] !== filtersRef.current[key]);
+
     if (filtersChanged) {
       // Skip the first render to prevent double API call
       if (isInitialMount.current) {
@@ -128,10 +133,10 @@ const PlantManagement = () => {
         filtersRef.current = cleanedFilters;
         return;
       }
-      
+
       setFilters(cleanedFilters);
       filtersRef.current = cleanedFilters;
-      setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filtering
+      setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
     }
   }, []);
 
@@ -163,6 +168,7 @@ const PlantManagement = () => {
     {
       key: "actions",
       title: "Actions",
+      sortable: false,
       render: (_, row) => {
         if (!row) return null;
 

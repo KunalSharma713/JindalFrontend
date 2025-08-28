@@ -45,7 +45,7 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await apiRequest("auth/login", "POST", data, false);
+      const response = await apiRequest("auth/web/login", "POST", data, false);
       console.log('Login response:', response); // Debug log
       
       if (response && response.accessToken) {

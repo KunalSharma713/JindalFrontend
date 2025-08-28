@@ -2,13 +2,13 @@
 const createBulkUploadService = (apiRequest) => ({
   // Upload location data
   uploadLocations: async (data) => {
-    return await apiRequest("bulkupload/location", "POST", data, true);
+    return await apiRequest("bulkupload/web/location", "POST", data, true);
   },
 
   // Get all location bulk uploads
   getLocationBulkUploads: async (page = 1, limit = 10, search = "") => {
     return await apiRequest(
-      "bulkupload/location/upload",
+      "bulkupload/web/location/upload",
       "POST",
       { page, limit, search },
       true
@@ -18,7 +18,7 @@ const createBulkUploadService = (apiRequest) => ({
   // Get successful records for a bulk upload
   getSuccessRecords: async (bulkId, page = 1, limit = 10) => {
     return await apiRequest(
-      "bulkupload/location/success",
+      "bulkupload/web/location/success",
       "POST",
       { bulkuploadid: bulkId, page, limit },
       true
@@ -28,7 +28,7 @@ const createBulkUploadService = (apiRequest) => ({
   // Get error records for a bulk upload
   getErrorRecords: async (bulkId, page = 1, limit = 10) => {
     return await apiRequest(
-      "bulkupload/location/error",
+      "bulkupload/web/location/error",
       "POST",
       { bulkuploadid: bulkId, page, limit },
       true

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useApi } from '../../hooks/useApi';
-import { toast } from 'react-hot-toast';
-import { Warehouse, CheckCircle } from 'lucide-react';
-import { setSelectedPlant } from '../../store/slices/plantSlice';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useApi } from "../../hooks/useApi";
+import { toast } from "react-hot-toast";
+import { Warehouse, CheckCircle } from "lucide-react";
+import { setSelectedPlant } from "../../store/slices/plantSlice";
+import { useDispatch } from "react-redux";
 
 const PlantSelection = () => {
   const [plants, setPlants] = useState([]);
@@ -19,21 +19,23 @@ const PlantSelection = () => {
     const fetchPlants = async () => {
       try {
         setLoading(true);
-        const response = await apiRequest('warehouse', 'GET');
+        const response = await apiRequest("warehouse/web", "GET");
         if (response && response.data) {
           setPlants(response.data);
           // Check if user has a default plant in local storage
-          const defaultPlantId = localStorage.getItem('selectedPlantId');
+          const defaultPlantId = localStorage.getItem("selectedPlantId");
           if (defaultPlantId) {
-            const defaultPlant = response.data.find(p => p._id === defaultPlantId);
+            const defaultPlant = response.data.find(
+              (p) => p._id === defaultPlantId
+            );
             if (defaultPlant) {
               handlePlantSelect(defaultPlant);
             }
           }
         }
       } catch (error) {
-        console.error('Error fetching plants:', error);
-        toast.error('Failed to load plants');
+        console.error("Error fetching plants:", error);
+        toast.error("Failed to load plants");
       } finally {
         setLoading(false);
       }
@@ -44,52 +46,55 @@ const PlantSelection = () => {
 
   const handlePlantSelect = async (plant) => {
     if (!plant || !plant._id) {
-      console.error('Invalid plant data provided');
-      toast.error('Invalid plant data');
+      console.error("Invalid plant data provided");
+      toast.error("Invalid plant data");
       return;
     }
 
     try {
       // Update local state for UI
       setSelectedPlant(plant._id);
-      
+
       // Prepare plant data
       const plantData = {
         _id: plant._id,
-        name: plant.name || '',
-        warehouse_name: plant.warehouse_name || '',
-        code: plant.code || ''
+        name: plant.name || "",
+        warehouse_name: plant.warehouse_name || "",
+        code: plant.code || "",
       };
-      
+
       // Create a plain action object
       const action = {
-        type: 'plant/setSelectedPlant',
-        payload: plantData
+        type: "plant/setSelectedPlant",
+        payload: plantData,
       };
-      
+
       // Dispatch the plain action object
       dispatch(action);
-      
+
       // Save to localStorage
-      localStorage.setItem('selectedPlant', JSON.stringify(plantData));
-      localStorage.setItem('selectedPlantId', plantData._id);
-      localStorage.setItem('selectedPlantName', plantData.warehouse_name || plantData.name || '');
-      
+      localStorage.setItem("selectedPlant", JSON.stringify(plantData));
+      localStorage.setItem("selectedPlantId", plantData._id);
+      localStorage.setItem(
+        "selectedPlantName",
+        plantData.warehouse_name || plantData.name || ""
+      );
+
       // Dispatch storage event to notify other components
-      window.dispatchEvent(new Event('storage'));
-      
+      window.dispatchEvent(new Event("storage"));
+
       // Small delay to ensure state is updated
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // Navigate to the original destination or dashboard
-      const from = location.state?.from?.pathname || '/dashboard';
+      const from = location.state?.from?.pathname || "/dashboard";
       navigate(from, { replace: true });
-      
+
       // Force a page reload to ensure all components pick up the new plant
       window.location.reload();
     } catch (error) {
-      console.error('Error selecting plant:', error);
-      toast.error('Failed to select plant');
+      console.error("Error selecting plant:", error);
+      toast.error("Failed to select plant");
     }
   };
 
@@ -108,7 +113,9 @@ const PlantSelection = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-extrabold text-gray-900">Select Your Plant</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900">
+            Select Your Plant
+          </h2>
           <p className="mt-2 text-lg text-gray-600">
             Choose a plant to continue to your dashboard
           </p>
@@ -121,8 +128,8 @@ const PlantSelection = () => {
               onClick={() => handlePlantSelect(plant)}
               className={`relative bg-white rounded-lg shadow-sm border-2 ${
                 selectedPlant === plant._id
-                  ? 'border-primary-500 ring-2 ring-primary-200'
-                  : 'border-gray-200 hover:border-primary-300 cursor-pointer'
+                  ? "border-primary-500 ring-2 ring-primary-200"
+                  : "border-gray-200 hover:border-primary-300 cursor-pointer"
               } transition-all duration-200 overflow-hidden`}
             >
               <div className="p-6">
@@ -131,7 +138,9 @@ const PlantSelection = () => {
                     <Warehouse className="h-6 w-6 text-primary-600" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">{plant.warehouse_name}</h3>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {plant.warehouse_name}
+                    </h3>
                     <p className="text-sm text-gray-500">{plant.code}</p>
                   </div>
                 </div>

@@ -52,7 +52,7 @@ const LocationManagement = () => {
         warehouse: warehouseId,
       });
 
-      const response = await apiRequest(`location/?${params}`, "GET");
+      const response = await apiRequest(`location/web/?${params}`, "GET");
 
       if (response && response.data) {
         // Transform data to match DataTable expected format
@@ -128,7 +128,7 @@ const LocationManagement = () => {
   const handleImportSuccess = () => {
     fetchLocations();
     setIsImportModalOpen(false);
-    toast.success('Locations imported successfully');
+    toast.success("Locations imported successfully");
   };
 
   const handleEdit = (location) => {
@@ -152,7 +152,7 @@ const LocationManagement = () => {
     }
     if (window.confirm("Are you sure you want to delete this location?")) {
       try {
-        await apiRequest(`location/${locationId}`, "DELETE");
+        await apiRequest(`location/web/${locationId}`, "DELETE");
         toast.success("Location deleted successfully");
         fetchLocations();
       } catch (error) {
@@ -222,6 +222,7 @@ const LocationManagement = () => {
     {
       key: "actions",
       title: "Actions",
+      sortable: false,
       render: (_, row) => {
         if (!row) return null;
 
@@ -260,63 +261,68 @@ const LocationManagement = () => {
     try {
       setIsImporting(true);
       const formData = new FormData();
-      formData.append('file', file);
-      
+      formData.append("file", file);
+
       // Get the warehouse ID from the current warehouse context
       const warehouseId = currentWarehouse?._id;
       if (!warehouseId) {
-        toast.error('Please select a warehouse first');
+        toast.error("Please select a warehouse first");
         return;
       }
-      
+
       // Add warehouse ID to the form data
-      formData.append('warehouse', warehouseId);
-      
+      formData.append("warehouse", warehouseId);
+
       // Make the API request with proper headers
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/location/import`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/location/import`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      });
-      
+      );
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to import locations');
+        throw new Error(data.message || "Failed to import locations");
       }
-      
-      toast.success(data.message || 'Locations imported successfully');
+
+      toast.success(data.message || "Locations imported successfully");
       fetchLocations();
       setImportIsOpen(false);
     } catch (error) {
-      console.error('Import error:', error);
-      toast.error(error.message || 'Failed to import locations. Please check the file format and try again.');
+      console.error("Import error:", error);
+      toast.error(
+        error.message ||
+          "Failed to import locations. Please check the file format and try again."
+      );
     } finally {
       setIsImporting(false);
     }
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ['Location Name', 'Latitude', 'Longitude', 'Barcode Key'];
+    const headers = ["Location Name", "Latitude", "Longitude", "Barcode Key"];
     const csvContent = [
-      headers.join(','),
-      'Location 1,28.6139,77.2090,BC001',
-      'Location 2,19.0760,72.8777,BC002',
-      'Location 3,12.9716,77.5946,BC003'
-    ].join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      headers.join(","),
+      "Location 1,28.6139,77.2090,BC001",
+      "Location 2,19.0760,72.8777,BC002",
+      "Location 3,12.9716,77.5946,BC003",
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.setAttribute('download', 'location_import_template.csv');
+    link.setAttribute("download", "location_import_template.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-
 
   return (
     <div className="space-y-6">
@@ -357,10 +363,18 @@ const LocationManagement = () => {
         {importIsOpen && (
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div
+                className="fixed inset-0 transition-opacity"
+                aria-hidden="true"
+              >
                 <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+              <span
+                className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                aria-hidden="true"
+              >
+                &#8203;
+              </span>
               <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                 <div className="absolute top-0 right-0 pt-4 pr-4">
                   <button
@@ -380,7 +394,7 @@ const LocationManagement = () => {
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
                         Upload a CSV file containing location data. <br />
-                        <button 
+                        <button
                           type="button"
                           onClick={handleDownloadTemplate}
                           className="text-blue-600 hover:text-blue-500 font-medium"
@@ -409,13 +423,33 @@ const LocationManagement = () => {
                           <div className="flex text-sm text-gray-600">
                             <label
                               htmlFor="file-upload"
-                              className={`relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${isImporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              className={`relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${
+                                isImporting
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
                             >
                               {isImporting ? (
                                 <span className="flex items-center">
-                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  <svg
+                                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
                                   </svg>
                                   Importing...
                                 </span>
@@ -430,18 +464,31 @@ const LocationManagement = () => {
                                 accept=".csv"
                                 disabled={isImporting}
                                 onChange={(e) => {
-                                  if (e.target.files && e.target.files.length > 0) {
+                                  if (
+                                    e.target.files &&
+                                    e.target.files.length > 0
+                                  ) {
                                     handleFileUpload(e.target.files[0]);
                                     // Reset the input value to allow selecting the same file again
-                                    e.target.value = '';
+                                    e.target.value = "";
                                   }
                                 }}
                               />
                             </label>
-                            <p className={`pl-1 ${isImporting ? 'opacity-50' : ''}`}>or drag and drop</p>
+                            <p
+                              className={`pl-1 ${
+                                isImporting ? "opacity-50" : ""
+                              }`}
+                            >
+                              or drag and drop
+                            </p>
                           </div>
-                          <p className={`text-xs ${isImporting ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {isImporting ? 'Processing...' : 'CSV up to 10MB'}
+                          <p
+                            className={`text-xs ${
+                              isImporting ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
+                            {isImporting ? "Processing..." : "CSV up to 10MB"}
                           </p>
                         </div>
                       </div>
@@ -509,23 +556,23 @@ const LocationManagement = () => {
                 </p>
                 <div className="mt-6">
                   <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsImportModalOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <Upload className="-ml-1 mr-2 h-5 w-5" />
-                    Import
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <Plus className="-ml-1 mr-2 h-5 w-5" />
-                    Add Location
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsImportModalOpen(true)}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      <Upload className="-ml-1 mr-2 h-5 w-5" />
+                      Import
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(true)}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      <Plus className="-ml-1 mr-2 h-5 w-5" />
+                      Add Location
+                    </button>
+                  </div>
                 </div>
               </div>
             }
@@ -549,6 +596,3 @@ const LocationManagement = () => {
 };
 
 export default LocationManagement;
-
-
-
