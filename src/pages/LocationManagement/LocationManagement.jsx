@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Edit3, Trash2, MapPin, Upload, FileText } from "lucide-react";
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  MapPin,
+  Upload,
+  FileText,
+  Download,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import DataTable from "../../components/DataTable";
 import LocationModal from "../../components/LocationManagement/LocationModal";
@@ -318,6 +326,93 @@ const LocationManagement = () => {
   const [importIsOpen, setImportIsOpen] = useState(false);
   const [importData, setImportData] = useState([]);
   const [isImporting, setIsImporting] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  // Handle download barcodes for selected rows
+  const handleDownloadBarcodes = async () => {
+    if (selectedRows.length < 2) {
+      toast.error("Please select at least 2 locations to download barcodes");
+      return;
+    }
+
+    try {
+      // Create a direct fetch request to handle the blob response
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_BASE_API_URL
+        }barcode-print/web/locations/multiple`,
+        {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/pdf',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            locationIds: selectedRows,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to download PDF");
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `location_barcodes.pdf`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Cleanup
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      toast.error(error.message || "Failed to download PDF");
+    }
+
+    // try {
+    //   // Call your API to generate and download the PDF
+    //   const response = await apiRequest(
+    //     "POST",
+    //     "/api/locations/download-barcodes",
+    //     {
+    //       locationIds: selectedRows,
+    //     },
+    //     {
+    //       responseType: "blob", // Important for file download
+    //     }
+    //   );
+
+    //   // Create a blob from the response
+    //   const url = window.URL.createObjectURL(new Blob([response.data]));
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   link.setAttribute(
+    //     "download",
+    //     `location-barcodes-${new Date().toISOString().split("T")[0]}.pdf`
+    //   );
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   link.remove();
+    // } catch (error) {
+    //   console.error("Error downloading barcodes:", error);
+    //   toast.error("Failed to download barcodes");
+    // }
+  };
 
   const handleFileUpload = async (file) => {
     try {
@@ -405,8 +500,18 @@ const LocationManagement = () => {
         <div className="mt-4 flex items-center gap-2 md:mt-0 md:ml-4">
           <button
             type="button"
+            onClick={handleDownloadBarcodes}
+            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
+              text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          >
+            <Download className="-ml-1 mr-2 h-5 w-5" />
+            Download Barcodes
+          </button>
+          <button
+            type="button"
             onClick={() => setIsImportModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md
+             text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <Upload className="-ml-1 mr-2 h-5 w-5" />
             Import
@@ -414,7 +519,8 @@ const LocationManagement = () => {
           <button
             type="button"
             onClick={handleAddLocation}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium
+             text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
             Add Location
@@ -599,6 +705,8 @@ const LocationManagement = () => {
             columns={columns}
             data={locations}
             loading={loading}
+            selectable={true}
+            onRowSelect={setSelectedRows}
             currentPage={pagination.page}
             itemsPerPage={pagination.limit}
             totalItems={pagination.total}

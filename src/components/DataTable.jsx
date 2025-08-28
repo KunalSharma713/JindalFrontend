@@ -18,10 +18,12 @@ const DataTable = ({
   onSort,
   onFilter,
   onEdit,
+  onRowSelect,
   sortConfig = { key: null, direction: "asc" },
   filters = {},
   editable = false,
   resizable = true,
+  selectable = false,
   emptyMessage = "No data available",
   totalPages = 1,
 }) => {
@@ -31,6 +33,7 @@ const DataTable = ({
   const [localFilters, setLocalFilters] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [resizing, setResizing] = useState(null);
+  const [selectedRows, setSelectedRows] = useState(new Set());
 
   const debounceRef = useRef(null);
   const isInitialMount = useRef(true);
@@ -39,25 +42,29 @@ const DataTable = ({
   useEffect(() => {
     if (isInitialMount.current) {
       // Initialize localFilters on first render
-      setLocalFilters(prev => ({
+      setLocalFilters((prev) => ({
         ...prev,
         ...Object.fromEntries(
-          Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
-        )
+          Object.entries(filters).filter(
+            ([_, value]) => value !== undefined && value !== ""
+          )
+        ),
       }));
       isInitialMount.current = false;
     } else {
       // Only update if filters have actually changed (prevent unnecessary re-renders)
       const filtersChanged = Object.keys({ ...filters, ...localFilters }).some(
-        key => filters[key] !== localFilters[key]
+        (key) => filters[key] !== localFilters[key]
       );
-      
+
       if (filtersChanged) {
-        setLocalFilters(prev => ({
+        setLocalFilters((prev) => ({
           ...prev,
           ...Object.fromEntries(
-            Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
-          )
+            Object.entries(filters).filter(
+              ([_, value]) => value !== undefined && value !== ""
+            )
+          ),
         }));
       }
     }
@@ -97,15 +104,19 @@ const DataTable = ({
       // Update local state immediately for responsive UI
       const newFilters = { ...localFilters, [key]: value };
       setLocalFilters(newFilters);
-      
+
       // Debounce the API call
       if (onFilter) {
         if (debounceRef.current) clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
           // Only include non-empty values in the filter
           const cleanedFilters = Object.fromEntries(
-            Object.entries(newFilters)
-              .filter(([_, val]) => val !== undefined && val !== null && val.toString().trim() !== '')
+            Object.entries(newFilters).filter(
+              ([_, val]) =>
+                val !== undefined &&
+                val !== null &&
+                val.toString().trim() !== ""
+            )
           );
           onFilter(cleanedFilters);
         }, 300); // Reduced debounce time for better UX
@@ -192,6 +203,53 @@ const DataTable = ({
       });
     });
   }, [data, localFilters, onFilter]);
+
+  // Handle row selection
+  const handleRowSelect = useCallback(
+    (rowId, checked) => {
+      setSelectedRows((prev) => {
+        const newSelected = new Set(prev);
+        if (checked) {
+          newSelected.add(rowId);
+        } else {
+          newSelected.delete(rowId);
+        }
+        if (onRowSelect) {
+          onRowSelect(Array.from(newSelected));
+        }
+        return newSelected;
+      });
+    },
+    [onRowSelect]
+  );
+
+  // Handle select all
+  const handleSelectAll = useCallback(
+    (checked) => {
+      const newSelected = checked
+        ? new Set(
+            filteredData.map(
+              (row) => row.id || `row-${filteredData.indexOf(row)}`
+            )
+          )
+        : new Set();
+      setSelectedRows(newSelected);
+      if (onRowSelect) {
+        onRowSelect(Array.from(newSelected));
+      }
+    },
+    [filteredData, onRowSelect]
+  );
+
+  // Reset selected rows when data changes
+  useEffect(() => {
+    setSelectedRows(new Set());
+  }, [data]);
+
+  // Count active filters
+  const activeFilterCount = Object.keys(localFilters).filter(
+    (key) => localFilters[key] && localFilters[key].trim() !== ""
+  ).length;
 
   // Pagination calculations
 
@@ -351,11 +409,6 @@ const DataTable = ({
     );
   };
 
-  // Count active filters
-  const activeFilterCount = Object.keys(localFilters).filter(
-    (key) => localFilters[key] && localFilters[key].trim() !== ""
-  ).length;
-
   return (
     <div className="space-y-4 p-4 ">
       {/* Filter Toggle */}
@@ -391,7 +444,7 @@ const DataTable = ({
                 col.key !== "actions"
             )
             .map((column) => {
-              const filterValue = localFilters[column.key] || '';
+              const filterValue = localFilters[column.key] || "";
               return (
                 <div key={column.key} className="flex flex-col text-sm">
                   <label className="mb-1 text-neutral-700 font-medium">
@@ -432,6 +485,21 @@ const DataTable = ({
           <table className="w-full text-sm">
             <thead className="bg-neutral-100 text-neutral-700">
               <tr>
+                {selectable && (
+                  <th className="py-2 w-10">
+                    <div className="flex items-center justify-center w-full">
+                      <input
+                        type="checkbox"
+                        checked={
+                          selectedRows.size > 0 &&
+                          selectedRows.size === filteredData.length
+                        }
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                    </div>
+                  </th>
+                )}
                 {columns.map((column) => (
                   <th
                     key={column.key}
@@ -503,18 +571,47 @@ const DataTable = ({
                   </td>
                 </tr>
               ) : (
-                filteredData.map((row, rowIndex) => (
-                  <tr
-                    key={row.id || rowIndex}
-                    className="border-t border-neutral-200 hover:bg-neutral-50 transition-colors"
-                  >
-                    {columns.map((column) => (
-                      <td key={column.key} className="px-3 py-2 align-middle">
-                        {renderCellContent(row, column, rowIndex)}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                filteredData.map((row, rowIndex) => {
+                  const rowId = row.id || `row-${rowIndex}`;
+                  const isSelected = selectedRows.has(rowId);
+
+                  return (
+                    <tr
+                      key={rowId}
+                      className={`border-t border-neutral-200 hover:bg-neutral-50 transition-colors ${
+                        isSelected ? "bg-blue-50" : ""
+                      }`}
+                    >
+                      {selectable && (
+                        <td className="py-2">
+                          <div className="flex items-center justify-center w-full">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) =>
+                                handleRowSelect(rowId, e.target.checked)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            />
+                          </div>
+                        </td>
+                      )}
+                      {columns.map((column) => (
+                        <td
+                          key={column.key}
+                          className="px-3 py-2 align-middle"
+                          onClick={() =>
+                            selectable && handleRowSelect(rowId, !isSelected)
+                          }
+                          style={{ cursor: selectable ? "pointer" : "default" }}
+                        >
+                          {renderCellContent(row, column, rowIndex)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
