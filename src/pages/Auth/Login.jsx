@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import {
   Lock,
   Mail,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { loginSuccess } from "../../store/slices/authSlice";
 import { useApi } from "../../hooks/useApi";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
 import stlLogo from "../../assets/jindal-steel-logo.png";
 
 const schema = yup.object({
@@ -27,7 +27,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || "/dashboard";
   const { apiRequest, loading, error } = useApi();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,50 +38,52 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      email: "username@google.com",
-      password: "password123",
+      email: "",
+      password: "",
     },
   });
 
   const onSubmit = async (data) => {
     try {
       const response = await apiRequest("auth/web/login", "POST", data, false);
-      console.log('Login response:', response); // Debug log
-      
+      console.log("Login response:", response); // Debug log
+
       if (response && response.accessToken) {
         const { accessToken, refreshToken, user } = response;
-        
+
         if (!accessToken || !user) {
-          throw new Error('Invalid response from server');
+          throw new Error("Invalid response from server");
         }
-        
+
         // Save to localStorage
-        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem("accessToken", accessToken);
         if (refreshToken) {
-          localStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem("refreshToken", refreshToken);
         }
-        localStorage.setItem('user', JSON.stringify(user));
-        
+        localStorage.setItem("user", JSON.stringify(user));
+
         // Clear any previously selected plant
-        localStorage.removeItem('selectedPlantId');
-        localStorage.removeItem('selectedPlantName');
-        
+        localStorage.removeItem("selectedPlantId");
+        localStorage.removeItem("selectedPlantName");
+
         // Dispatch login success
-        dispatch(loginSuccess({ 
-          token: accessToken, 
-          user: user
-        }));
-        
-        toast.success('Login successful!');
-        
+        dispatch(
+          loginSuccess({
+            token: accessToken,
+            user: user,
+          })
+        );
+
+        toast.success("Login successful!");
+
         // Always redirect to plant selection after login
-        navigate('/select-plant', { 
+        navigate("/select-plant", {
           state: { from: from },
-          replace: true 
+          replace: true,
         });
       }
     } catch (err) {
-      toast.error(err.message || 'An error occurred during login.');
+      toast.error(err.message || "An error occurred during login.");
     }
   };
 
@@ -167,7 +169,6 @@ const Login = () => {
                 )}
               </div>
 
-
               {/* Sign In Button */}
               <div>
                 <button
@@ -179,18 +180,13 @@ const Login = () => {
                 </button>
               </div>
             </form>
-
- 
           </div>
         </div>
       </div>
 
       {/* Right Side - Dashboard Preview */}
       <div className="border border-gray-200 w-1/2">
-
-
-            <img src={stlLogo} alt="Logo" className="w-full"/>
-          
+        <img src={stlLogo} alt="Logo" className="w-full" />
       </div>
     </div>
   );

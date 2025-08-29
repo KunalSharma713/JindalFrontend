@@ -11,9 +11,12 @@ import { useApi } from '../../hooks/useApi'
 const schema = yup.object({
   username: yup.string().required('Username is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().when('$isEditing', (isEditing, schema) => {
-    return isEditing ? schema.notRequired() : schema.required('Password is required').min(8, 'Password must be at least 8 characters');
-  }),
+  password: yup.string()
+    .when('$isEditing', {
+      is: true,
+      then: (schema) => schema,
+      otherwise: (schema) => schema.required('Password is required').min(8, 'Password must be at least 8 characters')
+    }),
   first_name: yup.string().required('First name is required'),
   last_name: yup.string().required('Last name is required'),
   mobile_no: yup.string().required('Mobile number is required').matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits'),
@@ -67,9 +70,9 @@ const UserModal = ({ isOpen, onClose }) => {
       }
 
       const payload = { 
-        ...data, 
+        ...data,
         roleid: "68a3028131afd421fe6313ca",
-        warehouse: selectedPlantId, 
+        warehouse: selectedPlantId,
       };
       
       if (isEditing && !payload.password) {

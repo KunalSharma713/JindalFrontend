@@ -85,7 +85,12 @@ const LocationModal = ({
         );
         toast.success("Location updated successfully!");
       } else {
-        const response = await apiRequest("location/web/", "POST", payload, true);
+        const response = await apiRequest(
+          "location/web/",
+          "POST",
+          payload,
+          true
+        );
         toast.success("Location added successfully!");
       }
 
@@ -153,14 +158,14 @@ const LocationModal = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Barcode
+                    Barcode (Auto-generated)
                   </label>
                   <input
                     type="text"
                     {...register("barcode_key")}
-                    className="input-field w-full"
-                    placeholder="Will be auto-generated"
-                    disabled={true}
+                    className="input-field w-full bg-gray-100 text-gray-700 font-semibold border border-gray-400 cursor-not-allowed"
+                    placeholder="Auto-generated"
+                    disabled
                   />
                 </div>
 

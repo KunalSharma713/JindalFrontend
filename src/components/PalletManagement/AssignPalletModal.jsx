@@ -42,7 +42,11 @@ export default function AssignPalletModal({
   const validate = () => {
     const newErrors = {};
     if (!formData.location) newErrors.location = "Location is required";
-    if (!formData.size) newErrors.size = "Size is required";
+    if (!formData.size) {
+      newErrors.size = "Size is required";
+    } else if (!/^\d+x\d+$/.test(formData.size)) {
+      newErrors.size = "Size must be in format 'number x number' (e.g. 48x36)";
+    }
     if (!formData.quantity || formData.quantity < 1)
       newErrors.quantity = "Quantity must be at least 1";
 
@@ -153,9 +157,19 @@ export default function AssignPalletModal({
               type="text"
               id="size"
               value={formData.size}
-              onChange={(e) =>
-                setFormData({ ...formData, size: e.target.value })
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                const isValidFormat = /^(\d{0,5})x?(\d{0,5})$/.test(value);
+                if (isValidFormat || value === "") {
+                  setFormData({ ...formData, size: value });
+                  setErrors((prev) => ({ ...prev, size: "" }));
+                } else {
+                  setErrors((prev) => ({
+                    ...prev,
+                    size: "Size must be in format 'number x number' (e.g. 48x36)",
+                  }));
+                }
+              }}
               className={`w-full px-3 py-2 border ${
                 errors.size ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}

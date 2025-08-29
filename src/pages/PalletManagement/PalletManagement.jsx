@@ -566,7 +566,7 @@ const PalletManagement = () => {
           </div>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0 md:ml-4">
-          {/* <button
+          <button
             type="button"
             onClick={handleDownloadBarcodes}
             className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
@@ -574,7 +574,7 @@ const PalletManagement = () => {
           >
             <Download className="-ml-1 mr-2 h-5 w-5" />
             Download Barcodes
-          </button> */}
+          </button>
           <button
             type="button"
             onClick={handleGenerateBarcode}

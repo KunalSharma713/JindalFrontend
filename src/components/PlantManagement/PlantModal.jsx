@@ -8,8 +8,21 @@ import { useApi } from "../../hooks/useApi";
 
 const schema = yup.object({
   warehouse_name: yup.string().required("Plant name is required"),
-  lat: yup.number().typeError("Latitude must be a number").nullable(),
-  long: yup.number().typeError("Longitude must be a number").nullable(),
+
+  lat: yup
+    .number()
+    .typeError("Latitude must be a number")
+    .nullable()
+    .notRequired()
+    .transform((value, originalValue) => (originalValue === "" ? null : value)),
+
+  long: yup
+    .number()
+    .typeError("Longitude must be a number")
+    .nullable()
+    .notRequired()
+    .transform((value, originalValue) => (originalValue === "" ? null : value)),
+
   code: yup.string().required("Code is required"),
 });
 
@@ -34,7 +47,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
 
   useEffect(() => {
     if (warehouse && Object.keys(warehouse).length > 0) {
-      console.log('Initializing form with warehouse data:', warehouse);
+      console.log("Initializing form with warehouse data:", warehouse);
       reset({
         warehouse_name: warehouse.warehouse_name || "",
         code: warehouse.code || "",
@@ -42,7 +55,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
         long: warehouse.long !== undefined ? warehouse.long : "",
       });
     } else {
-      console.log('Initializing empty form');
+      console.log("Initializing empty form");
       reset({
         warehouse_name: "",
         code: "",
@@ -57,13 +70,13 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
       if (isEditing) {
         // For update, include the _id in the URL and send all fields
         const response = await apiRequest(
-          `warehouse/web/${warehouse._id}`, 
-          "PUT", 
+          `warehouse/web/${warehouse._id}`,
+          "PUT",
           {
             warehouse_name: formData.warehouse_name,
             code: formData.code,
             lat: formData.lat || null,
-            long: formData.long || null
+            long: formData.long || null,
           },
           true
         );
@@ -71,13 +84,13 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
       } else {
         // For create
         const response = await apiRequest(
-          "warehouse/web", 
-          "POST", 
+          "warehouse/web",
+          "POST",
           {
             warehouse_name: formData.warehouse_name,
             code: formData.code,
             lat: formData.lat || null,
-            long: formData.long || null
+            long: formData.long || null,
           },
           true
         );
