@@ -160,7 +160,7 @@ export default function AssignPalletModal({
                 errors.size ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
               disabled={loading}
-              placeholder="e.g., 48x48x48"
+              placeholder="e.g., 48x36"
             />
             {errors.size && (
               <p className="mt-1 text-sm text-red-600">{errors.size}</p>

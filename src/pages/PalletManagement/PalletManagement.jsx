@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Edit3, Trash2, MapPin, PackagePlus } from "lucide-react";
+import {
+  Plus,
+  Edit3,
+  FileText,
+  MapPin,
+  PackagePlus,
+  Trash2,
+  Download,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import DataTable from "../../components/DataTable";
 import AssignPalletModal from "../../components/PalletManagement/AssignPalletModal";
@@ -13,7 +21,6 @@ const PalletManagement = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [barcodesAndPallets, setBarcodesAndPallets] = useState([]);
   const [selectedBarcode, setSelectedBarcode] = useState(null);
-  console.log("selectedBarcode", selectedBarcode);
   const [selectedPallet, setSelectedPallet] = useState(null);
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +40,7 @@ const PalletManagement = () => {
     const warehouseName = localStorage.getItem("selectedPlantName");
     return warehouseId ? { _id: warehouseId, name: warehouseName } : null;
   });
+  const [selectedRows, setSelectedRows] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const fetchLocations = useCallback(async () => {
     try {
@@ -195,6 +203,114 @@ const PalletManagement = () => {
       );
     } finally {
       setIsGenerating(false);
+    }
+  };
+  const handleDownloadPdf = async (locationId) => {
+    if (!locationId) {
+      console.error("No location ID provided for PDF download");
+      return;
+    }
+    try {
+      // Create a direct fetch request to handle the blob response
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_BASE_API_URL
+        }barcode-print/web/pallets?id=${locationId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to download PDF");
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `location_barcode_${locationId}.pdf`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Cleanup
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      toast.error(error.message || "Failed to download PDF");
+    }
+  };
+
+  const handleDownloadBarcodes = async () => {
+    if (selectedRows.length < 2) {
+      toast.error("Please select at least 2 barcodes to download");
+      return;
+    }
+
+    try {
+      // Create a direct fetch request to handle the blob response
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_BASE_API_URL
+        }barcode-print/web/pallets/multiple`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            barcodeIds: selectedRows,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to download PDF");
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `pallet_barcodes.pdf`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Cleanup
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      toast.error(error.message || "Failed to download PDF");
     }
   };
 
@@ -390,27 +506,44 @@ const PalletManagement = () => {
               <PackagePlus className="h-4 w-4" />
             </button>
           ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(row);
-              }}
-              className="text-blue-600 hover:text-blue-900"
-              title="Edit pallet"
-            >
-              <Edit3 className="h-4 w-4" />
-            </button>
+            row.status !== "used" && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(row);
+                }}
+                className="text-blue-600 hover:text-blue-900"
+                title="Edit pallet"
+              >
+                <Edit3 className="h-4 w-4" />
+              </button>
+            )
           )}
-          {/* <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(row._id || row.id);
-            }}
-            className="text-red-600 hover:text-red-900"
-            title="Delete pallet"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button> */}
+          {row.status !== "used" && (
+            <>
+              {" "}
+              {/* <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(row._id || row.id);
+                }}
+                className="text-red-600 hover:text-red-900"
+                title="Delete pallet"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button> */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownloadPdf(row._id || row.id);
+                }}
+                className="text-green-600 hover:text-green-900"
+                title="Download Barcode PDF"
+              >
+                <FileText className="h-4 w-4" />
+              </button>
+            </>
+          )}
         </div>
       ),
     },
@@ -432,7 +565,16 @@ const PalletManagement = () => {
             </p>
           </div>
         </div>
-        <div className="mt-4 flex md:mt-0 md:ml-4">
+        <div className="mt-4 flex items-center gap-2 md:mt-0 md:ml-4">
+          {/* <button
+            type="button"
+            onClick={handleDownloadBarcodes}
+            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
+              text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          >
+            <Download className="-ml-1 mr-2 h-5 w-5" />
+            Download Barcodes
+          </button> */}
           <button
             type="button"
             onClick={handleGenerateBarcode}
@@ -493,6 +635,9 @@ const PalletManagement = () => {
             columns={columns}
             data={barcodesAndPallets}
             loading={loading}
+            selectable={true}
+            rowSelect={(row) => row.status !== "used"}
+            onRowSelect={setSelectedRows}
             currentPage={pagination.page}
             itemsPerPage={pagination.limit}
             totalItems={pagination.total}

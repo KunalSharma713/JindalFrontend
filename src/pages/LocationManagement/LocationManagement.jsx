@@ -383,35 +383,6 @@ const LocationManagement = () => {
       console.error("Error downloading PDF:", error);
       toast.error(error.message || "Failed to download PDF");
     }
-
-    // try {
-    //   // Call your API to generate and download the PDF
-    //   const response = await apiRequest(
-    //     "POST",
-    //     "/api/locations/download-barcodes",
-    //     {
-    //       locationIds: selectedRows,
-    //     },
-    //     {
-    //       responseType: "blob", // Important for file download
-    //     }
-    //   );
-
-    //   // Create a blob from the response
-    //   const url = window.URL.createObjectURL(new Blob([response.data]));
-    //   const link = document.createElement("a");
-    //   link.href = url;
-    //   link.setAttribute(
-    //     "download",
-    //     `location-barcodes-${new Date().toISOString().split("T")[0]}.pdf`
-    //   );
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   link.remove();
-    // } catch (error) {
-    //   console.error("Error downloading barcodes:", error);
-    //   toast.error("Failed to download barcodes");
-    // }
   };
 
   const handleFileUpload = async (file) => {

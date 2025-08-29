@@ -5,6 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { User, Lock, Activity, Save } from "lucide-react";
 import { updateProfile } from "../../store/slices/authSlice";
+import { useApi } from "../../hooks/useApi";
+import { toast } from "react-hot-toast";
 
 const profileSchema = yup.object({
   name: yup.string().required("Name is required"),
@@ -28,6 +30,7 @@ const Profile = () => {
   const { user } = useSelector((state) => state.auth);
   const { activityLogs } = useSelector((state) => state.analytics);
   const [activeTab, setActiveTab] = useState("profile");
+  const { apiRequest, loading } = useApi();
 
   const profileForm = useForm({
     resolver: yupResolver(profileSchema),
@@ -59,17 +62,27 @@ const Profile = () => {
 
   const onPasswordSubmit = async (data) => {
     try {
-      // Simulate password change
+      await apiRequest(
+        "auth/web/update-password",
+        "PUT",
+        {
+          oldPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        },
+        true // auth required
+      );
+
       passwordForm.reset();
-      alert("Password changed successfully!");
+      toast.success("Password changed successfully!");
     } catch (error) {
       console.error("Error changing password:", error);
+      toast.error(error.message || "Failed to update password. Please try again.");
     }
   };
 
   const tabs = [
     { id: "profile", name: "Profile", icon: User },
-    // { id: "password", name: "Change Password", icon: Lock },
+    { id: "password", name: "Change Password", icon: Lock },
     // { id: "activity", name: "Activity Log", icon: Activity },
   ];
 
@@ -314,11 +327,11 @@ const Profile = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={passwordForm.formState.isSubmitting}
-                className="btn-primary flex items-center"
+                disabled={loading || passwordForm.formState.isSubmitting}
+                className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Lock className="w-4 h-4 mr-2" />
-                {passwordForm.formState.isSubmitting
+                {loading || passwordForm.formState.isSubmitting
                   ? "Changing..."
                   : "Change Password"}
               </button>

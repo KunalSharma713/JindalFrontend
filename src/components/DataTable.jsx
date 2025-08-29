@@ -26,6 +26,7 @@ const DataTable = ({
   selectable = false,
   emptyMessage = "No data available",
   totalPages = 1,
+  rowSelect = () => true, // Default to all rows being selectable
 }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -206,39 +207,45 @@ const DataTable = ({
 
   // Handle row selection
   const handleRowSelect = useCallback(
-    (rowId, checked) => {
-      setSelectedRows((prev) => {
-        const newSelected = new Set(prev);
-        if (checked) {
-          newSelected.add(rowId);
-        } else {
-          newSelected.delete(rowId);
-        }
-        if (onRowSelect) {
-          onRowSelect(Array.from(newSelected));
-        }
-        return newSelected;
-      });
-    },
-    [onRowSelect]
-  );
-
-  // Handle select all
-  const handleSelectAll = useCallback(
-    (checked) => {
-      const newSelected = checked
-        ? new Set(
-            filteredData.map(
-              (row) => row.id || `row-${filteredData.indexOf(row)}`
-            )
-          )
-        : new Set();
-      setSelectedRows(newSelected);
+    (rowId, isSelected, rowData) => {
+      // Check if row is selectable based on the rowSelect function
+      if (!rowSelect(rowData)) return;
+      
+      const newSelectedRows = new Set(selectedRows);
+      if (isSelected) {
+        newSelectedRows.add(rowId);
+      } else {
+        newSelectedRows.delete(rowId);
+      }
+      setSelectedRows(newSelectedRows);
       if (onRowSelect) {
-        onRowSelect(Array.from(newSelected));
+        onRowSelect(Array.from(newSelectedRows));
       }
     },
-    [filteredData, onRowSelect]
+    [onRowSelect, selectedRows, rowSelect]
+  );
+  
+  // Handle select all
+  const handleSelectAll = useCallback(
+    (isSelected) => {
+      let newSelectedRows = new Set();
+      
+      if (isSelected) {
+        // Only add rows that are selectable according to rowSelect function
+        filteredData.forEach((row, index) => {
+          const rowId = row.id || `row-${index}`;
+          if (rowSelect(row)) {
+            newSelectedRows.add(rowId);
+          }
+        });
+      }
+      
+      setSelectedRows(newSelectedRows);
+      if (onRowSelect) {
+        onRowSelect(Array.from(newSelectedRows));
+      }
+    },
+    [filteredData, onRowSelect, rowSelect]
   );
 
   // Reset selected rows when data changes
@@ -488,13 +495,13 @@ const DataTable = ({
               <thead className="bg-neutral-100 text-neutral-700">
                 <tr>
                 {selectable && (
-                  <th className="py-2 w-10">
+                  <th className="py-2 px-3 w-12">
                     <div className="flex items-center justify-center w-full">
                       <input
                         type="checkbox"
                         checked={
                           selectedRows.size > 0 &&
-                          selectedRows.size === filteredData.length
+                          selectedRows.size === filteredData.filter(row => rowSelect(row)).length
                         }
                         onChange={(e) => handleSelectAll(e.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
@@ -586,16 +593,21 @@ const DataTable = ({
                       }`}
                     >
                       {selectable && (
-                        <td className="py-2">
+                        <td className="py-2 px-3">
                           <div className="flex items-center justify-center w-full">
                             <input
                               type="checkbox"
                               checked={isSelected}
+                              disabled={!rowSelect(row)}
                               onChange={(e) =>
-                                handleRowSelect(rowId, e.target.checked)
+                                handleRowSelect(rowId, e.target.checked, row)
                               }
                               onClick={(e) => e.stopPropagation()}
-                              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                              className={`h-4 w-4 rounded border-gray-300 focus:ring-primary-500 ${
+                                rowSelect(row)
+                                  ? 'text-primary-600 cursor-pointer'
+                                  : 'text-gray-300 cursor-not-allowed'
+                              }`}
                             />
                           </div>
                         </td>
@@ -605,7 +617,7 @@ const DataTable = ({
                           key={column.key}
                           className="px-3 py-2 align-middle"
                           onClick={() =>
-                            selectable && handleRowSelect(rowId, !isSelected)
+                            selectable && handleRowSelect(rowId, !isSelected, row)
                           }
                           style={{ cursor: selectable ? "pointer" : "default" }}
                         >
