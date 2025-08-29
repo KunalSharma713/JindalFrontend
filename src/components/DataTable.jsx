@@ -411,30 +411,31 @@ const DataTable = ({
 
   return (
     <div className="space-y-4 p-4 ">
-      {/* Filter Toggle */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <button
-            className="px-3 py-1 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={16} /> Filters
-          </button>
-          {activeFilterCount > 0 && (
-            <span className="px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
-              {activeFilterCount} active
-            </span>
-          )}
+      {/* Filter Toggle - Only show if there's data */}
+      {filteredData.length > 0 && (
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-1 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter size={16} /> Filters
+            </button>
+            {activeFilterCount > 0 && (
+              <span className="px-2 py-0.5 bg-primary-100 text-primary-600 text-xs rounded-full">
+                {activeFilterCount} active
+              </span>
+            )}
+          </div>
+          <div className="text-sm text-neutral-500">
+            Showing {startItem} to {endItem} of{" "}
+            {onFilter ? totalItems : filteredData.length} entries
+          </div>
         </div>
-        <div className="text-sm text-neutral-500">
-          Showing {startItem} to {endItem} of{" "}
-          {onFilter ? totalItems : filteredData.length} entries
-        </div>
-      </div>
+      )}
 
-      {/* Filters */}
-
-      {showFilters && (
+      {/* Filters - Only show if there's data and filters are toggled */}
+      {filteredData.length > 0 && showFilters && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded border border-neutral-200">
           {columns
             .filter(
@@ -483,8 +484,9 @@ const DataTable = ({
       <div className="border border-neutral-200 rounded-lg overflow-hidden">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-100 text-neutral-700">
-              <tr>
+            {filteredData.length > 0 && (
+              <thead className="bg-neutral-100 text-neutral-700">
+                <tr>
                 {selectable && (
                   <th className="py-2 w-10">
                     <div className="flex items-center justify-center w-full">
@@ -500,54 +502,55 @@ const DataTable = ({
                     </div>
                   </th>
                 )}
-                {columns.map((column) => (
-                  <th
-                    key={column.key}
-                    style={{ width: columnWidths[column.key] }}
-                    className={`px-3 py-2 text-left font-semibold ${
-                      column.sortable !== false
-                        ? "cursor-pointer select-none hover:bg-neutral-200"
-                        : ""
-                    } transition-colors relative`}
-                    onClick={() =>
-                      column.sortable !== false && handleSort(column.key)
-                    }
-                  >
-                    <div className="flex justify-between items-center">
-                      {column.title}
-                      {column.sortable !== false && (
-                        <div className="flex flex-col ml-2">
-                          <ChevronUp
-                            size={12}
-                            className={`${
-                              sortConfig.key === column.key &&
-                              sortConfig.direction === "asc"
-                                ? "text-primary-500"
-                                : "text-neutral-400"
-                            }`}
-                          />
-                          <ChevronDown
-                            size={12}
-                            className={`${
-                              sortConfig.key === column.key &&
-                              sortConfig.direction === "desc"
-                                ? "text-primary-500"
-                                : "text-neutral-400"
-                            }`}
-                          />
-                        </div>
+                  {columns.map((column) => (
+                    <th
+                      key={column.key}
+                      style={{ width: columnWidths[column.key] }}
+                      className={`px-3 py-2 text-left font-semibold ${
+                        column.sortable !== false
+                          ? "cursor-pointer select-none hover:bg-neutral-200"
+                          : ""
+                      } transition-colors relative`}
+                      onClick={() =>
+                        column.sortable !== false && handleSort(column.key)
+                      }
+                    >
+                      <div className="flex justify-between items-center">
+                        {column.title}
+                        {column.sortable !== false && (
+                          <div className="flex flex-col ml-2">
+                            <ChevronUp
+                              size={12}
+                              className={`${
+                                sortConfig.key === column.key &&
+                                sortConfig.direction === "asc"
+                                  ? "text-primary-500"
+                                  : "text-neutral-400"
+                              }`}
+                            />
+                            <ChevronDown
+                              size={12}
+                              className={`${
+                                sortConfig.key === column.key &&
+                                sortConfig.direction === "desc"
+                                  ? "text-primary-500"
+                                  : "text-neutral-400"
+                              }`}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {resizable && (
+                        <div
+                          className="absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-primary-300 active:bg-primary-500"
+                          onMouseDown={(e) => handleMouseDown(e, column.key)}
+                        />
                       )}
-                    </div>
-                    {resizable && (
-                      <div
-                        className="absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-primary-300 active:bg-primary-500"
-                        onMouseDown={(e) => handleMouseDown(e, column.key)}
-                      />
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            )}
             <tbody>
               {loading ? (
                 <tr>
@@ -618,8 +621,8 @@ const DataTable = ({
         </div>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 0 && (
+      {/* Pagination - Only show if there are pages AND data */}
+      {totalPages > 0 && filteredData.length > 0 && (
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
           {/* Rows per page selector */}
           <div className="flex items-center gap-2 text-sm">
