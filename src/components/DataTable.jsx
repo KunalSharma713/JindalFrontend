@@ -207,45 +207,53 @@ const DataTable = ({
 
   // Handle row selection
   const handleRowSelect = useCallback(
-    (rowId, isSelected, rowData) => {
-      // Check if row is selectable based on the rowSelect function
-      if (!rowSelect(rowData)) return;
-
+    (row, event) => {
+      event.stopPropagation();
+      const rowId = row._id || row.id;
       const newSelectedRows = new Set(selectedRows);
-      if (isSelected) {
-        newSelectedRows.add(rowId);
-      } else {
+      
+      if (selectedRows.has(rowId)) {
         newSelectedRows.delete(rowId);
+      } else {
+        newSelectedRows.add(rowId);
       }
       setSelectedRows(newSelectedRows);
       if (onRowSelect) {
-        onRowSelect(Array.from(newSelectedRows));
+        // Get all selected row data
+        const selectedData = filteredData.filter(item => 
+          newSelectedRows.has(item._id || item.id)
+        );
+        onRowSelect(selectedData);
       }
     },
-    [onRowSelect, selectedRows, rowSelect]
+    [onRowSelect, selectedRows, filteredData]
   );
 
   // Handle select all
   const handleSelectAll = useCallback(
-    (isSelected) => {
-      let newSelectedRows = new Set();
+    (event) => {
+      event.stopPropagation();
+      const selectableRows = filteredData.filter((row) => rowSelect(row));
+      let newSelectedRows = new Set(selectedRows);
 
-      if (isSelected) {
-        // Only add rows that are selectable according to rowSelect function
-        filteredData.forEach((row, index) => {
-          const rowId = row.id || `row-${index}`;
-          if (rowSelect(row)) {
-            newSelectedRows.add(rowId);
-          }
-        });
+      if (selectableRows.length > selectedRows.size) {
+        // Select all selectable rows
+        selectableRows.forEach((row) => newSelectedRows.add(row._id || row.id));
+      } else {
+        // Deselect all
+        newSelectedRows = new Set();
       }
 
       setSelectedRows(newSelectedRows);
       if (onRowSelect) {
-        onRowSelect(Array.from(newSelectedRows));
+        // Get all selected row data
+        const selectedData = filteredData.filter(item => 
+          newSelectedRows.has(item._id || item.id)
+        );
+        onRowSelect(selectedData);
       }
     },
-    [filteredData, onRowSelect, rowSelect]
+    [filteredData, onRowSelect, rowSelect, selectedRows]
   );
 
   // Reset selected rows when data changes
@@ -505,7 +513,7 @@ const DataTable = ({
                               filteredData.filter((row) => rowSelect(row))
                                 .length
                           }
-                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          onChange={(e) => handleSelectAll(e)}
                           className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                       </div>
@@ -584,7 +592,7 @@ const DataTable = ({
                 </tr>
               ) : (
                 filteredData.map((row, rowIndex) => {
-                  const rowId = row.id || `row-${rowIndex}`;
+                  const rowId = row._id || row.id;
                   const isSelected = selectedRows.has(rowId);
 
                   return (
@@ -599,17 +607,10 @@ const DataTable = ({
                           <div className="flex items-center justify-center w-full">
                             <input
                               type="checkbox"
-                              checked={isSelected}
-                              disabled={!rowSelect(row)}
-                              onChange={(e) =>
-                                handleRowSelect(rowId, e.target.checked, row)
-                              }
+                              checked={selectedRows.has(row._id || row.id)}
+                              onChange={(e) => handleRowSelect(row, e)}
                               onClick={(e) => e.stopPropagation()}
-                              className={`h-4 w-4 rounded border-gray-300 focus:ring-primary-500 ${
-                                rowSelect(row)
-                                  ? "text-primary-600 cursor-pointer"
-                                  : "text-gray-300 cursor-not-allowed"
-                              }`}
+                              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
                             />
                           </div>
                         </td>

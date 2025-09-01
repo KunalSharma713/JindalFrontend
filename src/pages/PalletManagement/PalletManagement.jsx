@@ -8,10 +8,12 @@ import {
   PackagePlus,
   Trash2,
   Download,
+  Upload,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import DataTable from "../../components/DataTable";
 import AssignPalletModal from "../../components/PalletManagement/AssignPalletModal";
+import PickupPalletModal from "../../components/PalletManagement/PickupPalletModal";
 import { useApi } from "../../hooks/useApi";
 
 const PalletManagement = () => {
@@ -19,6 +21,8 @@ const PalletManagement = () => {
   const { apiRequest } = useApi();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
+
   const [barcodesAndPallets, setBarcodesAndPallets] = useState([]);
   const [selectedBarcode, setSelectedBarcode] = useState(null);
   const [selectedPallet, setSelectedPallet] = useState(null);
@@ -207,7 +211,7 @@ const PalletManagement = () => {
   };
   const handleDownloadPdf = async (locationId) => {
     if (!locationId) {
-      console.error("No location ID provided for PDF download");
+      console.error("No pallet ID provided for PDF download");
       return;
     }
     try {
@@ -240,7 +244,7 @@ const PalletManagement = () => {
       // Create a temporary anchor element to trigger the download
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `location_barcode_${locationId}.pdf`);
+      link.setAttribute("download", `pallet_barcode_${locationId}.pdf`);
       document.body.appendChild(link);
 
       // Trigger the download
@@ -314,6 +318,57 @@ const PalletManagement = () => {
     }
   };
 
+  const OpenPickupPalletsModal = async () => {
+    if (selectedRows.length === 0) {
+      toast.error("Please select at least one Pallet barcode");
+      return;
+    }
+
+    // Check if all selected rows have a valid quantity
+    const hasInvalidQuantity = selectedRows.some(
+      (row) => !row.quantity || row.quantity <= 0
+    );
+
+    if (hasInvalidQuantity) {
+      toast.error("Cannot pick up pallets with missing or invalid quantity");
+      return;
+    }
+
+    setIsPickupModalOpen(true);
+  };
+
+  const handlePickupPallets = async (rows) => {
+    try {
+      // Create a direct fetch request to handle the blob response
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_API_URL}pallet/web/pickup`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pallets: rows,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to Pickup Pallets");
+      }
+
+      toast.success("Pallets Picked Up successfully");
+      fetchBarcodesAndPallets();
+    } catch (error) {
+      console.error("Error Picking Pallets:", error);
+      toast.error(error.message || "Failed to Pickup Pallets");
+    }
+  };
+
   const handleAssign = (barcode) => {
     setSelectedBarcode(barcode);
     setSelectedPallet(null);
@@ -341,6 +396,9 @@ const PalletManagement = () => {
     }, 300);
   };
 
+  const closePickupModal = () => {
+    setIsPickupModalOpen(false);
+  };
   const handleDelete = async (locationId) => {
     if (!locationId) {
       console.error("No location ID provided for deletion");
@@ -568,6 +626,15 @@ const PalletManagement = () => {
         <div className="mt-4 flex items-center gap-2 md:mt-0 md:ml-4">
           <button
             type="button"
+            onClick={OpenPickupPalletsModal}
+            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
+              text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          >
+            <Upload className="-ml-1 mr-2 h-5 w-5" />
+            Pickup Pallets
+          </button>
+          <button
+            type="button"
             onClick={handleDownloadBarcodes}
             className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
               text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
@@ -680,6 +747,14 @@ const PalletManagement = () => {
         pallet={selectedPallet}
         onAssign={handlePalletAssigned}
         locations={locations}
+      />
+
+      {/* Pallet Modal */}
+      <PickupPalletModal
+        isOpen={isPickupModalOpen}
+        onClose={closePickupModal}
+        selectedPallets={selectedRows}
+        onSubmit={handlePickupPallets}
       />
     </div>
   );

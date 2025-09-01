@@ -327,6 +327,7 @@ const LocationManagement = () => {
   const [importData, setImportData] = useState([]);
   const [isImporting, setIsImporting] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  console.log("selectedRowsll", selectedRows);
   // Handle download barcodes for selected rows
   const handleDownloadBarcodes = async () => {
     if (selectedRows.length < 2) {
@@ -344,9 +345,9 @@ const LocationManagement = () => {
         {
           method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/pdf',
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            Accept: "application/pdf",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             locationIds: selectedRows,
