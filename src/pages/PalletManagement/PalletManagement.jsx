@@ -339,28 +339,9 @@ const PalletManagement = () => {
 
   const handlePickupPallets = async (rows) => {
     try {
-      // Create a direct fetch request to handle the blob response
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_API_URL}pallet/web/pickup`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/pdf",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pallets: rows,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to Pickup Pallets");
-      }
-
+      await apiRequest(`pallet/web/pickup`, 'POST', {
+        pallets: rows,
+      });
       toast.success("Pallets Picked Up successfully");
       fetchBarcodesAndPallets();
     } catch (error) {

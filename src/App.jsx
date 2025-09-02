@@ -11,6 +11,7 @@ import ProjectDetails from './pages/ProjectManagement/ProjectDetails';
 import PermissionsManagement from './pages/PermissionsManagement/PermissionsManagement';
 import Profile from './pages/Profile/Profile';
 import Login from './pages/Auth/Login';
+import ResetPassword from './pages/Auth/ResetPassword';
 import TestAuth from './pages/Auth/TestAuth';
 import PlantSelection from './pages/PlantSelection/PlantSelection';
 import LocationManagement from './pages/LocationManagement/LocationManagement';
@@ -87,6 +88,7 @@ function App() {
   return (
     <Routes>
       <Route path="/test-auth" element={<TestAuth />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route 
         path="/login" 
         element={

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ForgotPasswordModal from "../../components/Auth/ForgotPasswordModal";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -30,6 +31,7 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/dashboard";
   const { apiRequest, loading, error } = useApi();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const {
     register,
@@ -169,6 +171,17 @@ const Login = () => {
                 )}
               </div>
 
+              {/* Forgot Password Link */}
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none"
+                >
+                  Forgot your password?
+                </button>
+              </div>
+
               {/* Sign In Button */}
               <div>
                 <button
@@ -188,6 +201,12 @@ const Login = () => {
       <div className="border border-gray-200 w-1/2">
         <img src={stlLogo} alt="Logo" className="w-full" />
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 };
