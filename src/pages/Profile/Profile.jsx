@@ -82,7 +82,7 @@ const Profile = () => {
 
   const tabs = [
     { id: "profile", name: "Profile", icon: User },
-    { id: "password", name: "Change Password", icon: Lock },
+    // { id: "password", name: "Change Password", icon: Lock },
     // { id: "activity", name: "Activity Log", icon: Activity },
   ];
 
