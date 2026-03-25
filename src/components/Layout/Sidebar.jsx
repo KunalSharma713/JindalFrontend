@@ -10,7 +10,6 @@ import {
   X,
   Factory,
   LogOut,
-  Settings,
   Palette,
   Locate,
   ChevronDown,
