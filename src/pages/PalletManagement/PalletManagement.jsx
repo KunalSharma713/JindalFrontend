@@ -532,14 +532,14 @@ const PalletManagement = () => {
       title: "Actions",
       sortable: false,
       render: (_, row) => (
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           {!row.pallet ? (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleAssign(row);
               }}
-              className="text-green-600 hover:text-green-900"
+              className="text-green-600 hover:text-green-900 p-1"
               title="Assign pallet"
             >
               <PackagePlus className="h-4 w-4" />
@@ -551,7 +551,7 @@ const PalletManagement = () => {
                   e.stopPropagation();
                   handleEdit(row);
                 }}
-                className="text-blue-600 hover:text-blue-900"
+                className="text-blue-600 hover:text-blue-900 p-1"
                 title="Edit pallet"
               >
                 <Edit3 className="h-4 w-4" />
@@ -566,7 +566,7 @@ const PalletManagement = () => {
                   e.stopPropagation();
                   handleDelete(row._id || row.id);
                 }}
-                className="text-red-600 hover:text-red-900"
+                className="text-red-600 hover:text-red-900 p-1"
                 title="Delete pallet"
               >
                 <Trash2 className="h-4 w-4" />
@@ -576,7 +576,7 @@ const PalletManagement = () => {
                   e.stopPropagation();
                   handleDownloadPdf(row._id || row.id);
                 }}
-                className="text-green-600 hover:text-green-900"
+                className="text-green-600 hover:text-green-900 p-1"
                 title="Download Barcode PDF"
               >
                 <FileText className="h-4 w-4" />

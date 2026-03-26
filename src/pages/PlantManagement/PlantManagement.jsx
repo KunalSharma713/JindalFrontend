@@ -173,13 +173,13 @@ const PlantManagement = () => {
         if (!row) return null;
 
         return (
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleEditWarehouse(row);
               }}
-              className="text-blue-600 hover:text-blue-900"
+              className="text-blue-600 hover:text-blue-900 p-1"
               title="Edit warehouse"
             >
               <Edit3 className="h-4 w-4" />
@@ -189,7 +189,7 @@ const PlantManagement = () => {
                 e.stopPropagation();
                 handleDeleteWarehouse(row._id);
               }}
-              className="text-red-600 hover:text-red-900"
+              className="text-red-600 hover:text-red-900 p-1"
               title="Delete warehouse"
             >
               <Trash2 className="h-4 w-4" />

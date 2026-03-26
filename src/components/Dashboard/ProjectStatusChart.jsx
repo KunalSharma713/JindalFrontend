@@ -24,13 +24,13 @@ const ProjectStatusChart = ({ data }) => {
   }
 
   return (
-    <div className="card p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Project Status</h3>
-        <p className="text-sm text-gray-500">Distribution of project statuses</p>
+    <div className="card p-4 sm:p-6">
+      <div className="mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900">Project Status</h3>
+        <p className="text-xs sm:text-sm text-gray-500">Distribution of project statuses</p>
       </div>
       
-      <div className="h-80">
+      <div className="h-64 sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

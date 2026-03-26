@@ -3,13 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 const RevenueChart = ({ data }) => {
   return (
-    <div className="card p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Revenue vs Expenses</h3>
-        <p className="text-sm text-gray-500">Monthly revenue and expense comparison</p>
+    <div className="card p-4 sm:p-6">
+      <div className="mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900">Revenue vs Expenses</h3>
+        <p className="text-xs sm:text-sm text-gray-500">Monthly revenue and expense comparison</p>
       </div>
       
-      <div className="h-80">
+      <div className="h-64 sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

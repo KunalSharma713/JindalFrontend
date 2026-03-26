@@ -43,18 +43,18 @@ const ProjectDetailView = ({ project, onBack }) => {
   const budgetUsed = (project.spent / project.budget) * 100
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <button
             onClick={onBack}
             className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 sm:truncate">{project.name}</h1>
             <p className="text-sm text-gray-500">{project.description}</p>
           </div>
         </div>
@@ -66,74 +66,74 @@ const ProjectDetailView = ({ project, onBack }) => {
       </div>
 
       {/* Project Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="card p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Duration</p>
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Duration</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900">
                 {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Team Size</p>
-              <p className="text-lg font-semibold text-gray-900">{assignedUsers.length} members</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Team Size</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900">{assignedUsers.length} members</p>
             </div>
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Budget</p>
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Budget</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900">
                 ${project.spent.toLocaleString()} / ${project.budget.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Progress</p>
-              <p className="text-lg font-semibold text-gray-900">{project.progress}%</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Progress</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900">{project.progress}%</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Team Members */}
-      <div className="card p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Team Members</h3>
-        <div className="flex flex-wrap gap-4">
+      <div className="card p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Team Members</h3>
+        <div className="flex flex-wrap gap-3 sm:gap-4">
           {assignedUsers.map((user) => (
-            <div key={user.id} className="flex items-center space-x-3 bg-gray-50 rounded-lg p-3">
+            <div key={user.id} className="flex items-center space-x-2 sm:space-x-3 bg-gray-50 rounded-lg p-3">
               <img
                 className="h-8 w-8 rounded-full"
                 src={user.avatar}
@@ -149,15 +149,15 @@ const ProjectDetailView = ({ project, onBack }) => {
       </div>
 
       {/* Project Spans */}
-      <div className="card p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Project Spans</h3>
-        <div className="space-y-6">
+      <div className="card p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Project Spans</h3>
+        <div className="space-y-4 sm:space-y-6">
           {project.spans?.map((span) => (
-            <div key={span.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
+            <div key={span.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
-                  <h4 className="text-md font-medium text-gray-900">{span.name}</h4>
-                  <p className="text-sm text-gray-500">
+                  <h4 className="text-base sm:text-md font-medium text-gray-900">{span.name}</h4>
+                  <p className="text-xs sm:text-sm text-gray-500">
                     {new Date(span.startDate).toLocaleDateString()} - {new Date(span.endDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -168,14 +168,14 @@ const ProjectDetailView = ({ project, onBack }) => {
                       style={{ width: `${span.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-600">{span.progress}%</span>
+                  <span className="text-xs sm:text-sm text-gray-600">{span.progress}%</span>
                 </div>
               </div>
 
               {/* Activity Nodes */}
               <div className="space-y-3">
                 <h5 className="text-sm font-medium text-gray-700">Activity Nodes</h5>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {span.activities?.map((activity) => (
                     <div key={activity.id} className="bg-gray-50 rounded-lg p-3 border-l-4 border-primary-500">
                       <div className="flex items-center justify-between mb-2">

@@ -270,29 +270,29 @@ const ProjectListing = () => {
       </div>
 
       {/* Projects Tree View */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {filteredProjects.map((project) => (
-          <div key={project.id} className="card p-6">
+          <div key={project.id} className="card p-4 sm:p-6">
             {/* Project Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-6 w-6 text-blue-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Activity className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">{project.name}</h2>
-                  <p className="text-sm text-gray-500">{project.description}</p>
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{project.name}</h2>
+                  <p className="text-xs sm:text-sm text-gray-500">{project.description}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-2">
                 <div className="flex items-center space-x-2">
-                  <div className="w-20 bg-gray-200 rounded-full h-2">
+                  <div className="w-16 sm:w-20 bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-600">{project.progress}%</span>
+                  <span className="text-xs sm:text-sm text-gray-600">{project.progress}%</span>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(project.status)}`}>
                   {project.status}
@@ -302,28 +302,28 @@ const ProjectListing = () => {
                   className="p-1 hover:bg-gray-100 rounded"
                 >
                   {expandedItems.has(project.id) ? (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   ) : (
-                    <ChevronRight className="h-5 w-5 text-gray-500" />
+                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   )}
                 </button>
               </div>
             </div>
 
             {/* Project Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
               <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">Manager: {project.assignedAreaManager}</span>
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                <span className="text-xs sm:text-sm text-gray-600 truncate">Manager: {project.assignedAreaManager}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                <span className="text-xs sm:text-sm text-gray-600">
                   {formatDate(project.startDate)} - {formatDate(project.endDate)}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">
+                <span className="text-xs sm:text-sm text-gray-600 truncate">
                   Budget: {formatCurrency(project.budget)}
                 </span>
               </div>
@@ -332,13 +332,13 @@ const ProjectListing = () => {
             {/* Expandable Content */}
             {expandedItems.has(project.id) && (
               <div className="border-t border-gray-200 pt-4">
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {renderSpans(project.spans, project.id)}
                 </div>
                 <div className="mt-4 flex flex-row justify-end">
                   <button
                     onClick={() => handleViewProject(project)}
-                    className="btn-primary text-sm inline-flex items-center"
+                    className="btn-primary text-xs sm:text-sm inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2"
                   >
                     <Eye size={14} className="mr-2"/>
                     View Details

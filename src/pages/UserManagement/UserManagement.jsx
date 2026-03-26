@@ -173,7 +173,7 @@ const UserManagement = () => {
       title: "Actions",
       sortable: false,
       render: (_, row) => (
-        <div className="flex space-x-2">
+        <div className="flex space-x-1 sm:space-x-2">
           <button
             onClick={() => handleEditUser(row)}
             className="p-1 text-blue-600 hover:bg-blue-50 rounded"

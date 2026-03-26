@@ -9,9 +9,9 @@ const TestAuth = () => {
   }, [isAuthenticated, user, loading]);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace' }}>
-      <h2>Authentication State</h2>
-      <pre>
+    <div className="p-4 sm:p-6 lg:p-8 font-mono">
+      <h2 className="text-lg sm:text-xl lg:text-2xl font-mono mb-4">Authentication State</h2>
+      <pre className="text-xs sm:text-sm bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
         {JSON.stringify({
           isAuthenticated,
           user,

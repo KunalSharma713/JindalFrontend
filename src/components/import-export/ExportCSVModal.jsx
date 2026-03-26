@@ -62,25 +62,25 @@ const ExportCSVModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={closeModal} className="max-w-md">
-      <div className="relative w-full p-4 overflow-y-auto  no-scrollbar rounded-3xl  lg:p-11">
+      <div className="relative w-full p-3 sm:p-4 overflow-y-auto  no-scrollbar rounded-3xl  lg:p-11">
         <div className="px-2 pr-14">
-          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+          <h4 className="mb-2 text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white/90">
             {header}
           </h4>
         </div>
         <form className="flex flex-col">
           <div className="px-2 overflow-y-auto custom-scrollbar max-h-[55vh]">
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
               {statusText}
             </p>
           </div>
           {isGenerating && (
-            <div className="mt-6 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+            <div className="mt-4 sm:mt-6 flex justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-4 border-blue-500 border-t-transparent"></div>
             </div>
           )}
         </form>
-        <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
+        <div className="flex items-center gap-2 sm:gap-3 px-2 mt-4 sm:mt-6 lg:justify-end">
           <button
             size="sm"
             variant="outline"

@@ -287,13 +287,13 @@ const LocationManagement = () => {
         if (!row) return null;
 
         return (
-          <div className="flex space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleEdit(row);
               }}
-              className="text-blue-600 hover:text-blue-900"
+              className="text-blue-600 hover:text-blue-900 p-1"
               title="Edit location"
             >
               <Edit3 className="h-4 w-4" />
@@ -303,7 +303,7 @@ const LocationManagement = () => {
                 e.stopPropagation();
                 handleDelete(row._id || row.id);
               }}
-              className="text-red-600 hover:text-red-900"
+              className="text-red-600 hover:text-red-900 p-1"
               title="Delete location"
             >
               <Trash2 className="h-4 w-4" />
@@ -313,7 +313,7 @@ const LocationManagement = () => {
                 e.stopPropagation();
                 handleDownloadPdf(row._id || row.id);
               }}
-              className="text-green-600 hover:text-green-900"
+              className="text-green-600 hover:text-green-900 p-1"
               title="Download Barcode PDF"
             >
               <FileText className="h-4 w-4" />
@@ -504,7 +504,7 @@ const LocationManagement = () => {
       {/* Import Modal */}
       {importIsOpen && (
           <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-2 sm:px-4 pb-20 text-center sm:block sm:p-0">
               <div
                 className="fixed inset-0 transition-opacity"
                 aria-hidden="true"
@@ -517,24 +517,24 @@ const LocationManagement = () => {
               >
                 &#8203;
               </span>
-              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+              <div className="inline-block align-bottom bg-white rounded-lg px-3 sm:px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full w-full max-w-sm mx-auto sm:p-6">
                 <div className="absolute top-0 right-0 pt-4 pr-4">
                   <button
                     type="button"
-                    className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
+                    className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none p-1"
                     onClick={() => setImportIsOpen(false)}
                   >
                     <span className="sr-only">Close</span>
-                    <X className="h-6 w-6" aria-hidden="true" />
+                    <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                   </button>
                 </div>
                 <div>
                   <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    <h3 className="text-base sm:text-lg leading-6 font-medium text-gray-900">
                       Import Locations
                     </h3>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         Upload a CSV file containing location data. <br />
                         <button
                           type="button"
@@ -545,8 +545,8 @@ const LocationManagement = () => {
                         </button>
                       </p>
                     </div>
-                    <div className="mt-6">
-                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className="mt-4 sm:mt-6">
+                      <div className="mt-1 flex justify-center px-4 sm:px-6 pt-4 sm:pt-5 pb-4 sm:pb-6 border-2 border-gray-300 border-dashed rounded-md">
                         <div className="space-y-1 text-center">
                           <svg
                             className="mx-auto h-12 w-12 text-gray-400"
@@ -640,7 +640,7 @@ const LocationManagement = () => {
                 <div className="mt-5 sm:mt-6">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     onClick={() => setImportIsOpen(false)}
                   >
                     Close
@@ -698,21 +698,21 @@ const LocationManagement = () => {
                   Get started by creating a new location.
                 </p>
                 <div className="mt-6">
-                  <div className="flex space-x-3">
+                  <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setIsImportModalOpen(true)}
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      <Upload className="-ml-1 mr-2 h-5 w-5" />
+                      <Upload className="-ml-1 mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                       Import
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(true)}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      <Plus className="-ml-1 mr-2 h-5 w-5" />
+                      <Plus className="-ml-1 mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                       Add Location
                     </button>
                   </div>
