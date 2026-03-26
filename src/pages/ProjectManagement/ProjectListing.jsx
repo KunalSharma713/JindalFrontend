@@ -169,11 +169,13 @@ const ProjectListing = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Project Listing</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 sm:truncate">
+            Project Listing
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
             View and track all projects with their spans, nodes, and activities
           </p>
@@ -181,22 +183,22 @@ const ProjectListing = () => {
       </div>
 
       {/* Filters */}
-      <div className="card p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1">
             <input
               type="text"
               placeholder="Search projects or area managers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field"
+              className="input-field text-sm"
             />
           </div>
           <div className="sm:w-48">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input-field"
+              className="input-field text-sm"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -209,39 +211,39 @@ const ProjectListing = () => {
       </div>
 
       {/* Project Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="card p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Activity className="h-8 w-8 text-blue-600" />
+              <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Projects</p>
-              <p className="text-2xl font-semibold text-gray-900">{projects.length}</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Projects</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{projects.length}</p>
             </div>
           </div>
         </div>
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <MapPin className="h-8 w-8 text-green-600" />
+              <MapPin className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Spans</p>
-              <p className="text-2xl font-semibold text-gray-900">
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Spans</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {projects.reduce((total, project) => total + project.spans.length, 0)}
               </p>
             </div>
           </div>
         </div>
-        <div className="card p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Settings className="h-8 w-8 text-purple-600" />
+              <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Nodes</p>
-              <p className="text-2xl font-semibold text-gray-900">
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Nodes</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {projects.reduce((total, project) => 
                   total + project.spans.reduce((spanTotal, span) => 
                     spanTotal + span.nodes.length, 0), 0)}

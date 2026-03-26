@@ -87,11 +87,11 @@ const Profile = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page header */}
-      <div className="md:flex md:items-center md:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-7 text-gray-900 sm:truncate">
             Profile Settings
           </h2>
           <p className="mt-1 text-sm text-gray-500">
@@ -125,16 +125,16 @@ const Profile = () => {
         </div>
       </div> */}
 
-      <div className="card p-6">
-        <div className="flex items-center space-x-6">
+      <div className="card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
           <div className="flex-shrink-0">
             {/* User icon instead of image */}
-            <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center">
-              <User className="h-10 w-10 text-gray-400" />
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gray-100 flex items-center justify-center">
+              <User className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
             </div>
           </div>
-          <div>
-            <h3 className="text-xl font-medium text-gray-900">
+          <div className="text-center sm:text-left">
+            <h3 className="text-lg sm:text-xl font-medium text-gray-900">
               {user?.username?.toUpperCase()}
             </h3>
             <p className="text-sm text-gray-500">{user?.email}</p>

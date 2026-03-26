@@ -17,20 +17,20 @@ const RecentActivity = ({ activities }) => {
   }
 
   return (
-    <div className="card p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-        <p className="text-sm text-gray-500">Latest actions performed in the system</p>
+    <div className="card p-4 sm:p-6">
+      <div className="mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900">Recent Activity</h3>
+        <p className="text-xs sm:text-sm text-gray-500">Latest actions performed in the system</p>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {activities?.slice(0, 10).map((activity) => (
-          <div key={activity.id} className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+          <div key={activity.id} className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 flex items-center justify-center">
               {getActivityIcon(activity.type)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-900">
+              <p className="text-xs sm:text-sm text-gray-900">
                 <span className="font-medium">{activity.user}</span> {activity.action}
                 {activity.target && (
                   <span className="font-medium text-blue-600"> {activity.target}</span>
@@ -47,7 +47,7 @@ const RecentActivity = ({ activities }) => {
         ))}
       </div>
       
-      <div className="mt-6">
+      <div className="mt-4 sm:mt-6">
         <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
           View all activity
         </button>

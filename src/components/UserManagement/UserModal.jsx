@@ -118,64 +118,64 @@ const UserModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-end justify-center min-h-screen pt-4 px-2 sm:px-4 pb-20 text-center sm:block sm:p-0">
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={handleClose} />
 
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full w-full max-w-sm mx-auto">
+          <div className="bg-white px-3 sm:px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900">
                 {isEditing ? 'Edit User' : 'Add New User'}
               </h3>
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-500 p-1"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                  <input type="text" {...register('username')} className={`input-field ${errors.username ? 'border-red-300' : ''}`} placeholder="Enter username" />
-                  {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Username</label>
+                  <input type="text" {...register('username')} className={`input-field text-sm ${errors.username ? 'border-red-300' : ''}`} placeholder="Enter username" />
+                  {errors.username && <p className="mt-1 text-xs text-red-600">{errors.username.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input type="email" {...register('email')} className={`input-field ${errors.email ? 'border-red-300' : ''}`} placeholder="Enter email address" />
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" {...register('email')} className={`input-field text-sm ${errors.email ? 'border-red-300' : ''}`} placeholder="Enter email address" />
                   {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                  <input type="text" {...register('first_name')} className={`input-field ${errors.first_name ? 'border-red-300' : ''}`} placeholder="Enter first name" />
-                  {errors.first_name && <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input type="text" {...register('first_name')} className={`input-field text-sm ${errors.first_name ? 'border-red-300' : ''}`} placeholder="Enter first name" />
+                  {errors.first_name && <p className="mt-1 text-xs text-red-600">{errors.first_name.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                  <input type="text" {...register('last_name')} className={`input-field ${errors.last_name ? 'border-red-300' : ''}`} placeholder="Enter last name" />
-                  {errors.last_name && <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input type="text" {...register('last_name')} className={`input-field text-sm ${errors.last_name ? 'border-red-300' : ''}`} placeholder="Enter last name" />
+                  {errors.last_name && <p className="mt-1 text-xs text-red-600">{errors.last_name.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                  <input type="text" {...register('mobile_no')} className={`input-field ${errors.mobile_no ? 'border-red-300' : ''}`} placeholder="Enter mobile number" />
-                  {errors.mobile_no && <p className="mt-1 text-sm text-red-600">{errors.mobile_no.message}</p>}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                  <input type="text" {...register('mobile_no')} className={`input-field text-sm ${errors.mobile_no ? 'border-red-300' : ''}`} placeholder="Enter mobile number" />
+                  {errors.mobile_no && <p className="mt-1 text-xs text-red-600">{errors.mobile_no.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                  <input type="password" {...register('password')} className={`input-field ${errors.password ? 'border-red-300' : ''}`} placeholder={isEditing ? 'New password (optional)' : 'Enter password'} />
-                  {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <input type="password" {...register('password')} className={`input-field text-sm ${errors.password ? 'border-red-300' : ''}`} placeholder={isEditing ? 'New password (optional)' : 'Enter password'} />
+                  {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
-                <button type="button" onClick={handleClose} className="btn-secondary">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+                <button type="button" onClick={handleClose} className="btn-secondary px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={loading} className="btn-primary">
+                <button type="submit" disabled={loading} className="btn-primary px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm">
                   {loading ? 'Saving...' : (isEditing ? 'Update User' : 'Add User')}
                 </button>
               </div>

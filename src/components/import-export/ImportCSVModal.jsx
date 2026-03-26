@@ -216,24 +216,24 @@ const ImportCSVModal = ({
           &#8203;
         </span>
 
-        <div className="inline-block w-full max-w-4xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
-          <div className="px-6 pt-5 pb-4">
+        <div className="inline-block w-full max-w-2xl sm:max-w-4xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle mx-2 sm:mx-0">
+          <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900">
                 Import {type === "location" ? "Locations" : "Items"} from CSV
               </h3>
               <button
                 type="button"
-                className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
+                className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none p-1"
                 onClick={onClose}
               >
                 <span className="sr-only">Close</span>
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
 
             {activeTab === "uploaded" && fileData.length > 0 ? (
-              <div className="mt-6 overflow-x-auto">
+              <div className="mt-4 sm:mt-6 overflow-x-auto">
                 <div className="align-middle inline-block min-w-full border-b border-gray-200">
                   <table className="min-w-full">
                     <thead className="bg-gray-50">
@@ -241,12 +241,12 @@ const ImportCSVModal = ({
                         {headers.map((header, index) => (
                           <th
                             key={index}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                           >
                             {header}
                           </th>
                         ))}
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status
                         </th>
                       </tr>
@@ -262,12 +262,12 @@ const ImportCSVModal = ({
                           {headers.map((header, colIndex) => (
                             <td
                               key={`${rowIndex}-${colIndex}`}
-                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                              className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500"
                             >
                               {row[header]}
                             </td>
                           ))}
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                             {row.isValid ? (
                               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 Valid
@@ -285,23 +285,23 @@ const ImportCSVModal = ({
                 </div>
               </div>
             ) : (
-              <div className="mt-6 border-t border-gray-200 pt-4">
+              <div className="mt-4 sm:mt-6 border-t border-gray-200 pt-4">
                 <h4 className="text-sm font-medium text-gray-900">
                   Requirements:
                 </h4>
-                <ul className="mt-2 space-y-2 text-sm text-gray-500">
+                <ul className="mt-2 space-y-2 text-xs sm:text-sm text-gray-500">
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 flex-shrink-0" />
                     <span>File must be in CSV format</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 flex-shrink-0" />
                     <span>
                       Required fields: Location Name, Latitude, Longitude
                     </span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 flex-shrink-0" />
                     <span>Maximum file size: 10MB</span>
                   </li>
                 </ul>
@@ -310,18 +310,19 @@ const ImportCSVModal = ({
 
             {/* Tabs */}
             <div className="border-b border-gray-200 mt-4">
-              <nav className="-mb-px flex space-x-8">
+              <nav className="-mb-px flex space-x-4 sm:space-x-8">
                 <button
                   onClick={() => setActiveTab("upload")}
                   className={`${
                     activeTab === "upload"
                       ? "border-blue-500 text-blue-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm`}
                 >
                   <div className="flex items-center">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload File
+                    <Upload className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Upload File</span>
+                    <span className="sm:hidden">Upload</span>
                   </div>
                 </button>
 
@@ -332,11 +333,12 @@ const ImportCSVModal = ({
                       activeTab === "uploaded"
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                    } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm`}
                   >
                     <div className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      File Details
+                      <FileText className="h-4 w-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">File Details</span>
+                      <span className="sm:hidden">Details</span>
                     </div>
                   </button>
                 )}
@@ -347,27 +349,28 @@ const ImportCSVModal = ({
                     activeTab === "requests"
                       ? "border-blue-500 text-blue-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  } whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm`}
                 >
                   <div className="flex items-center">
-                    <List className="h-4 w-4 mr-2" />
-                    Import History
+                    <List className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Import History</span>
+                    <span className="sm:hidden">History</span>
                   </div>
                 </button>
               </nav>
             </div>
           </div>
 
-          <div className="px-6 pb-6">{renderTabContent()}</div>
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6">{renderTabContent()}</div>
 
           {/* Footer with Import Button */}
           {activeTab === "uploaded" && fileData.length > 0 && (
-            <div className="bg-gray-50 px-6 py-4 sm:px-6 flex justify-end space-x-3">
+            <div className="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={handleImport}
                 disabled={!isValid || isImporting}
-                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                className={`inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white ${
                   isValid && !isImporting
                     ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
                     : "bg-blue-400 cursor-not-allowed"

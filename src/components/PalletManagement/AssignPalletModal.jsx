@@ -82,11 +82,10 @@ export default function AssignPalletModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-medium">
-            {" "}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md mx-auto">
+        <div className="flex justify-between items-center p-3 sm:p-4 border-b">
+          <h3 className="text-base sm:text-lg font-medium">
             {pallet ? "Update" : "Assign"} Pallet
           </h3>
           <button
@@ -94,24 +93,24 @@ export default function AssignPalletModal({
               onClose();
               Reset();
             }}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-gray-400 hover:text-gray-500 p-1"
             disabled={loading}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 space-y-3 sm:space-y-4">
           {barcode && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Barcode
               </label>
               <input
                 type="text"
                 value={barcode.barcode_key}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-gray-100"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-gray-100"
               />
             </div>
           )}
@@ -119,7 +118,7 @@ export default function AssignPalletModal({
           <div>
             <label
               htmlFor="location"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Location <span className="text-red-500">*</span>
             </label>
@@ -129,7 +128,7 @@ export default function AssignPalletModal({
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
               }
-              className={`w-full px-3 py-2 border ${
+              className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                 errors.location ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
               disabled={loading}
@@ -149,7 +148,7 @@ export default function AssignPalletModal({
           <div>
             <label
               htmlFor="size"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Size <span className="text-red-500">*</span>
             </label>
@@ -170,21 +169,21 @@ export default function AssignPalletModal({
                   }));
                 }
               }}
-              className={`w-full px-3 py-2 border ${
+              className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                 errors.size ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
               disabled={loading}
               placeholder="e.g., 48x36"
             />
             {errors.size && (
-              <p className="mt-1 text-sm text-red-600">{errors.size}</p>
+              <p className="mt-1 text-xs text-red-600">{errors.size}</p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="quantity"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Quantity <span className="text-red-500">*</span>
             </label>
@@ -199,17 +198,17 @@ export default function AssignPalletModal({
                   quantity: parseInt(e.target.value) || 1,
                 })
               }
-              className={`w-full px-3 py-2 border ${
+              className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                 errors.quantity ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
               disabled={loading}
             />
             {errors.quantity && (
-              <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+              <p className="mt-1 text-xs text-red-600">{errors.quantity}</p>
             )}
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
             <button
               type="button"
               onClick={() => {
@@ -217,14 +216,14 @@ export default function AssignPalletModal({
                 Reset();
               }}
               disabled={loading}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading
                 ? "Saving..."

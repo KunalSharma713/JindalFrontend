@@ -589,12 +589,12 @@ const PalletManagement = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page header */}
-      <div className="md:flex md:items-center md:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div>
-            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-7 text-gray-900 sm:truncate">
               Pallet Management
             </h2>
             <p className="mt-1 text-sm text-gray-500">
@@ -604,30 +604,32 @@ const PalletManagement = () => {
             </p>
           </div>
         </div>
-        <div className="mt-4 flex items-center gap-2 md:mt-0 md:ml-4">
+        <div className="flex flex-wrap items-center gap-2 sm:mt-0 sm:ml-4">
           <button
             type="button"
             onClick={OpenPickupPalletsModal}
-            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
+            className={`inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md 
               text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           >
-            <Upload className="-ml-1 mr-2 h-5 w-5" />
-            Pickup Pallets
+            <Upload className="-ml-1 mr-1 sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Pickup Pallets</span>
+            <span className="sm:hidden">Pickup</span>
           </button>
           <button
             type="button"
             onClick={handleDownloadBarcodes}
-            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md 
+            className={`inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md 
               text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           >
-            <Download className="-ml-1 mr-2 h-5 w-5" />
-            Download Barcodes
+            <Download className="-ml-1 mr-1 sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Download Barcodes</span>
+            <span className="sm:hidden">Download</span>
           </button>
           <button
             type="button"
             onClick={handleGenerateBarcode}
             disabled={isGenerating}
-            className={`ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+            className={`inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white ${
               isGenerating
                 ? "bg-primary-400"
                 : "bg-primary-600 hover:bg-primary-700"
@@ -636,7 +638,7 @@ const PalletManagement = () => {
             {isGenerating ? (
               <>
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  className="animate-spin -ml-1 mr-1 sm:mr-2 h-4 w-4 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -695,24 +697,26 @@ const PalletManagement = () => {
             sortConfig={sortConfig}
             onFilter={handleFilter}
             emptyState={
-              <div className="text-center py-12">
-                <MapPin className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No pallets found
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Get started by creating a new pallet.
-                </p>
-                <div className="mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                    New Pallet
-                  </button>
-                </div>
+              <div className="text-center">
+                <>
+                  <MapPin className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">
+                    No pallets found
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Get started by creating a new pallet.
+                  </p>
+                  <div className="mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(true)}
+                      className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      <Plus className="-ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+                      New Pallet
+                    </button>
+                  </div>
+                </>
               </div>
             }
           />

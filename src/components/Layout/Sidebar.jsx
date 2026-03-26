@@ -46,20 +46,20 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {/* Desktop sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="flex flex-col w-64">
+        <div className="flex flex-col w-64 xl:w-72">
           <div className="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
             {/* Logo */}
             <div className="flex items-center flex-shrink-0 px-4">
               <div className="flex items-center">
-                <img src={stlLogo} alt="STL Logo" className="h-8 w-auto" />
-                <span className="ml-3 text-xl font-semibold text-gray-900">
+                <img src={stlLogo} alt="STL Logo" className="h-7 w-auto sm:h-8" />
+                <span className="ml-2 sm:ml-3 text-lg sm:text-xl font-semibold text-gray-900">
                   Jindal Steel
                 </span>
               </div>
             </div>
 
             {/* Navigation */}
-            <nav className="mt-8 flex-1 px-2 space-y-1">
+            <nav className="mt-6 sm:mt-8 flex-1 px-2 space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive =
@@ -72,8 +72,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                     to={item.href}
                     className={`sidebar-link ${isActive ? "active" : ""}`}
                   >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.name}
+                    <Icon className="mr-3 h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="text-xs sm:text-sm">{item.name}</span>
                   </NavLink>
                 );
               })}
@@ -156,29 +156,29 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Mobile sidebar */}
       <div
-        className={`lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white transform ${
+        className={`lg:hidden fixed inset-y-0 left-0 z-50 w-64 sm:w-72 bg-white transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between flex-shrink-0 px-4 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between flex-shrink-0 px-3 py-3 sm:px-4 sm:py-4 border-b border-gray-200">
             <div className="flex items-center">
-              <img src={stlLogo} alt="STL Logo" className="h-8 w-auto" />
-              <span className="ml-3 text-xl font-semibold text-gray-900">
-                Super Admin
+              <img src={stlLogo} alt="STL Logo" className="h-6 w-auto sm:h-8" />
+              <span className="ml-2 sm:ml-3 text-base sm:text-xl font-semibold text-gray-900">
+                Jindal Steel
               </span>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-1.5 sm:p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-2 py-3 sm:py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -192,8 +192,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                   onClick={onClose}
                   className={`sidebar-link ${isActive ? "active" : ""}`}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  <Icon className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-xs sm:text-sm">{item.name}</span>
                 </NavLink>
               );
             })}

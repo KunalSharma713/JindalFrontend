@@ -87,41 +87,41 @@ export default function PickupPalletModal({
   if (!isOpen || selectedPallets.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-medium">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl sm:max-w-4xl mx-auto">
+        <div className="flex justify-between items-center p-3 sm:p-4 border-b">
+          <h3 className="text-base sm:text-lg font-medium">
             Pickup Pallets ({selectedPallets.length} selected)
           </h3>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-gray-400 hover:text-gray-500 p-1"
             disabled={loading}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4">
           <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               Update quantities for the selected pallets and confirm pickup.
             </p>
 
-            <div className="overflow-y-auto max-h-96">
+            <div className="overflow-y-auto max-h-72 sm:max-h-96">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Barcode
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Current Qty
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Pickup Qty
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
                   </tr>
@@ -129,13 +129,13 @@ export default function PickupPalletModal({
                 <tbody className="bg-white divide-y divide-gray-200">
                   {selectedPallets.map((pallet) => (
                     <tr key={pallet.pallet_id}>
-                      <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                         {pallet.barcode_key}
                       </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                         {pallet.quantity}
                       </td>
-                      <td className="px-4 py-2 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-2 whitespace-nowrap">
                         <input
                           type="number"
                           min="1"
@@ -147,7 +147,7 @@ export default function PickupPalletModal({
                               e.target.value
                             )
                           }
-                          className={`w-24 px-2 py-1 border ${
+                          className={`w-20 sm:w-24 px-2 py-1 text-sm border ${
                             errors[pallet.pallet_id]
                               ? "border-red-500"
                               : "border-gray-300"
@@ -160,7 +160,7 @@ export default function PickupPalletModal({
                           </p>
                         )}
                       </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                         {pallet?.location_name || pallet.location || "N/A"}
                       </td>
                     </tr>
@@ -170,18 +170,18 @@ export default function PickupPalletModal({
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end space-x-3">
+          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
               disabled={loading}
             >
               {loading ? (

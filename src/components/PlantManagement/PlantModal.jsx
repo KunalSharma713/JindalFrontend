@@ -112,7 +112,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-end justify-center min-h-screen pt-4 px-2 sm:px-4 pb-20 text-center sm:block sm:p-0">
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={handleClose}
@@ -122,29 +122,29 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
           &#8203;
         </span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full w-full max-w-sm mx-auto">
+          <div className="bg-white px-3 sm:px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900">
                 {isEditing ? "Update Plant" : "Add New Plant"}
               </h3>
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-500 p-1"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Plant Name
                 </label>
                 <input
                   type="text"
                   {...register("warehouse_name")}
-                  className={`w-full px-3 py-2 border ${
+                  className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                     errors.warehouse_name ? "border-red-300" : "border-gray-300"
                   } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
                   placeholder="Enter plant name"
@@ -157,69 +157,69 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Code
                 </label>
                 <input
                   type="text"
                   {...register("code")}
-                  className={`w-full px-3 py-2 border ${
+                  className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                     errors.code ? "border-red-300" : "border-gray-300"
                   } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
                   placeholder="Enter code"
                 />
                 {errors.code && (
-                  <p className="mt-1 text-sm text-red-600">
+                  <p className="mt-1 text-xs text-red-600">
                     {errors.code.message}
                   </p>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Latitude
                   </label>
                   <input
                     type="number"
                     step="0.000001"
                     {...register("lat")}
-                    className={`w-full px-3 py-2 border ${
+                    className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                       errors.lat ? "border-red-300" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
                     placeholder="Enter latitude (optional)"
                   />
                   {errors.lat && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p className="mt-1 text-xs text-red-600">
                       {errors.lat.message}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Longitude
                   </label>
                   <input
                     type="number"
                     step="0.000001"
                     {...register("long")}
-                    className={`w-full px-3 py-2 border ${
+                    className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border ${
                       errors.long ? "border-red-300" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500`}
                     placeholder="Enter longitude (optional)"
                   />
                   {errors.long && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p className="mt-1 text-xs text-red-600">
                       {errors.long.message}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <div className="mt-5 sm:mt-6 flex flex-col sm:grid sm:grid-cols-2 gap-2 sm:gap-3">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:col-start-2 sm:text-sm disabled:opacity-50"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:col-start-2 disabled:opacity-50"
                 >
                   {loading
                     ? "Saving..."
@@ -230,7 +230,7 @@ const PlantModal = ({ isOpen, onClose, warehouse }) => {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:col-start-1"
                 >
                   Cancel
                 </button>

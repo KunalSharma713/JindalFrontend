@@ -186,25 +186,25 @@ const PlantSwitcher = () => {
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-72 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+        <div className="origin-top-right absolute right-0 mt-2 w-64 sm:w-72 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
           <div className="py-2">
-            <div className="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-100">
+            <div className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 border-b border-gray-100">
               Select Plant
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-72 sm:max-h-96 overflow-y-auto">
               {plants.map((plant) => (
                 <button
                   key={plant._id}
                   onClick={() => handleSelectPlant(plant)}
-                  className={`w-full px-4 py-3 text-sm flex items-center hover:bg-gray-50 ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm flex items-center hover:bg-gray-50 ${
                     currentPlant?._id === plant._id ? "bg-blue-50" : ""
                   }`}
                 >
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                    <Factory className="h-4 w-4 text-blue-600" />
+                  <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-100 flex items-center justify-center mr-2 sm:mr-3">
+                    <Factory className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                       {plant.warehouse_name || plant.name}
                     </p>
                     <div className="flex items-center mt-0.5">
@@ -212,7 +212,7 @@ const PlantSwitcher = () => {
                         {plant.code || "No code"}
                       </span>
                       {currentPlant?._id === plant._id && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        <span className="ml-2 inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                           Current
                         </span>
                       )}
@@ -220,7 +220,7 @@ const PlantSwitcher = () => {
                   </div>
                   <div className="w-5 flex items-center justify-center">
                     {currentPlant?._id === plant._id && (
-                      <Check className="h-5 w-5 text-blue-600" />
+                      <Check className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                     )}
                   </div>
                 </button>

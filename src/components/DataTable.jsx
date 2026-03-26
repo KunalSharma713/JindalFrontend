@@ -425,13 +425,13 @@ const DataTable = ({
   };
 
   return (
-    <div className="space-y-4 p-4 ">
+    <div className="space-y-4 p-2 sm:p-4">
       {/* Filter Toggle - Only show if there's data */}
       {filteredData.length > 0 && (
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div className="flex items-center gap-2">
             <button
-              className="px-3 py-1 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
+              className="px-3 py-1.5 text-sm border rounded bg-white hover:bg-neutral-50 text-neutral-700 border-neutral-300 flex items-center gap-1 transition-colors"
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter size={16} /> Filters
@@ -451,7 +451,7 @@ const DataTable = ({
 
       {/* Filters - Only show if there's data and filters are toggled */}
       {filteredData.length > 0 && showFilters && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded border border-neutral-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-neutral-50 p-3 rounded border border-neutral-200">
           {columns
             .filter(
               (col) =>
@@ -498,12 +498,12 @@ const DataTable = ({
       {/* Table */}
       <div className="border border-neutral-200 rounded-lg overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs sm:text-sm">
             {filteredData.length > 0 && (
               <thead className="bg-neutral-100 text-neutral-700">
                 <tr>
                   {selectable && (
-                    <th className="py-2 px-3 w-12">
+                    <th className="py-2 px-2 sm:px-3 w-12">
                       <div className="flex items-center justify-center w-full">
                         <input
                           type="checkbox"
@@ -522,8 +522,8 @@ const DataTable = ({
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      style={{ width: columnWidths[column.key] }}
-                      className={`px-3 py-2 text-left font-semibold ${
+                      style={{ width: columnWidths[column.key], minWidth: '100px' }}
+                      className={`px-2 sm:px-3 py-2 text-left font-semibold ${
                         column.sortable !== false
                           ? "cursor-pointer select-none hover:bg-neutral-200"
                           : ""

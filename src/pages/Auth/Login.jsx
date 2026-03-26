@@ -92,18 +92,18 @@ const Login = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full mx-auto">
           {/* Logo and Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               Sign in to Account
             </h2>
           </div>
 
           {/* Login Form */}
-          <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="bg-white rounded-lg border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit(onSubmit)}>
               {/* Email Field */}
               <div>
                 <label
@@ -198,8 +198,8 @@ const Login = () => {
       </div>
 
       {/* Right Side - Dashboard Preview */}
-      <div className="border border-gray-200 w-1/2">
-        <img src={stlLogo} alt="Logo" className="w-full" />
+      <div className="hidden lg:block w-1/2 border border-gray-200">
+        <img src={stlLogo} alt="Logo" className="w-full h-full object-cover" />
       </div>
 
       {/* Forgot Password Modal */}

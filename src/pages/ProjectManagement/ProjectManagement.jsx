@@ -55,23 +55,23 @@ const ProjectManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page header */}
-      <div className="md:flex md:items-center md:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-7 text-gray-900 sm:truncate">
             Project Management
           </h2>
           <p className="mt-1 text-sm text-gray-500">
             Manage projects, track progress, and assign team members.
           </p>
         </div>
-        <div className="mt-4 flex md:mt-0 md:ml-4">
+        <div className="flex sm:mt-0 sm:ml-4">
           <button
             onClick={handleAddProject}
-            className="btn-primary flex items-center"
+            className="btn-primary flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
             Add Project
           </button>
         </div>
@@ -81,27 +81,27 @@ const ProjectManagement = () => {
       <ProjectStats projects={projects} />
 
       {/* Search and filters */}
-      <div className="card p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
               <input
                 type="text"
                 placeholder="Search projects..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10"
+                className="input-field pl-9 sm:pl-10 text-sm"
               />
             </div>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="btn-secondary flex items-center"
+            className="btn-secondary flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm"
           >
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4 mr-1 sm:mr-2" />
             Filters
           </button>
         </div>
